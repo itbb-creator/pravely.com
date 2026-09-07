@@ -24,6 +24,34 @@ function status(message, bad = false) {
 }
 if (params.has('sent')) show('sent'); else show('invalid');
 
+async function establishRecoverySession() {
+  if (params.has('code')) {
+    const { error } = await supabase.auth.exchangeCodeForSession(params.get('code'));
+    if (error) throw error;
+    recoveryAuthorized = true;
+    show('reset-form');
+    history.replaceState({}, '', './recovery.html?authorized=1');
+    return;
+  }
+  if (params.has('token_hash')) {
+    const { error } = await supabase.auth.verifyOtp({
+      token_hash: params.get('token_hash'),
+      type: 'recovery',
+    });
+    if (error) throw error;
+    recoveryAuthorized = true;
+    show('reset-form');
+    history.replaceState({}, '', './recovery.html?authorized=1');
+  }
+}
+
+try {
+  await establishRecoverySession();
+} catch (error) {
+  status(error?.message || 'This reset link is no longer valid. Request a new link and try again.', true);
+  show('invalid');
+}
+
 supabase.auth.onAuthStateChange((event, session) => {
   if (event === 'PASSWORD_RECOVERY' || (session && recoveryIntent && event === 'SIGNED_IN')) {
     recoveryAuthorized = true;
@@ -38,7 +66,7 @@ if (hash.get('type') === 'recovery') {
 if (hash.get('error_description')) status(hash.get('error_description').replaceAll('+', ' '), true);
 
 const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-if (session && recoveryIntent) {
+if (session && (recoveryIntent || params.has('authorized'))) {
   recoveryAuthorized = true;
   show('reset-form');
   history.replaceState({}, '', './recovery.html?authorized=1');

@@ -36,6 +36,20 @@ function showError(message) {
 }
 const hash = new URLSearchParams(location.hash.slice(1));
 if (hash.get('error_description')) showError(hash.get('error_description').replaceAll('+', ' '));
+try {
+  if (params.has('code')) {
+    const { error } = await supabase.auth.exchangeCodeForSession(params.get('code'));
+    if (error) throw error;
+  } else if (params.has('token_hash')) {
+    const { error } = await supabase.auth.verifyOtp({
+      token_hash: params.get('token_hash'),
+      type: params.get('type') === 'signup' ? 'signup' : 'email',
+    });
+    if (error) throw error;
+  }
+} catch (error) {
+  showError(error?.message || 'This verification link is no longer valid.');
+}
 supabase.auth.onAuthStateChange((event, session) => {
   if (session?.user && event !== 'PASSWORD_RECOVERY') showVerified();
 });

@@ -8,6 +8,7 @@ const params = new URLSearchParams(location.search);
 const email = params.get('email');
 if (email) document.getElementById('email').textContent = email;
 document.getElementById('open-app').href = config.appUrl || 'https://app.pravely.com';
+document.getElementById('waiting-open-app').href = config.appUrl || 'https://app.pravely.com';
 
 document.getElementById('prepare-workbook').addEventListener('click', async (event) => {
   const button = event.currentTarget;

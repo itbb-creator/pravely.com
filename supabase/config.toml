@@ -1,8 +1,18 @@
 # Hosted Auth settings are configured in the Supabase dashboard. These values
 # keep local Auth tests aligned with production.
 [auth]
-site_url = "https://pravely.com"
-additional_redirect_urls = ["https://pravely.com/account.html", "https://pravely.com/confirmation.html", "https://pravely.com/recovery.html", "https://app.pravely.com", "http://localhost:4173/account.html", "http://127.0.0.1:4174/confirmation.html", "http://127.0.0.1:4174/recovery.html"]
+site_url = "https://app.pravely.com"
+additional_redirect_urls = ["https://app.pravely.com", "https://app.pravely.com/**", "https://pravely.com/account.html", "https://pravely.com/confirmation.html", "https://pravely.com/recovery.html", "https://pravelyapp.netlify.app/**", "http://localhost:4173/account.html", "http://127.0.0.1:4174/confirmation.html", "http://127.0.0.1:4174/recovery.html"]
+minimum_password_length = 8
+
+[auth.mfa.totp]
+enroll_enabled = true
+verify_enabled = true
+
+[auth.email]
+enable_confirmations = true
+max_frequency = "1m"
+otp_length = 8
 
 [auth.email.template.confirmation]
 subject = "Verify your Pravely account"

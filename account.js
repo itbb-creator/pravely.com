@@ -12,7 +12,9 @@ const signupForm = byId('signup-form'), loginForm = byId('login-form'), forgotFo
 const changePasswordForm = byId('change-password-form');
 const productionSiteUrl = 'https://pravely.com';
 const siteUrl = ['localhost', '127.0.0.1'].includes(location.hostname) ? location.origin : productionSiteUrl;
-const confirmationUrl = `${siteUrl}/confirmation.html`;
+const confirmationUrl = ['localhost', '127.0.0.1'].includes(location.hostname)
+  ? `${siteUrl}/confirmation.html`
+  : (config.appUrl || 'https://app.pravely.com');
 const recoveryUrl = `${siteUrl}/recovery.html`;
 
 byId('year').textContent = new Date().getFullYear();

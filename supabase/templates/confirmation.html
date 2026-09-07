@@ -8,7 +8,7 @@
             <div style="font-size:24px;font-weight:700;color:#073f34;margin-bottom:24px">Pravely</div>
             <h1 style="font-size:28px;line-height:1.2;margin:0 0 16px;color:#12201d">Finish creating your account</h1>
             <p style="font-size:16px;line-height:1.6;margin:0 0 26px;color:#40504b">Verify your email to access your Pravely account and licensed Essentials workbook.</p>
-            <a href="{{ .ConfirmationURL }}" style="display:inline-block;background:#073f34;color:#ffffff;text-decoration:none;font-weight:700;padding:14px 22px;border-radius:999px">Verify my email</a>
+            <a href="{{ .RedirectTo }}?token_hash={{ .TokenHash }}&amp;type=email" style="display:inline-block;background:#073f34;color:#ffffff;text-decoration:none;font-weight:700;padding:14px 22px;border-radius:999px">Verify my email</a>
             <p style="font-size:13px;line-height:1.55;margin:28px 0 0;color:#687873">If you didn’t create a Pravely account, you can safely ignore this message.</p>
           </td></tr>
         </table>

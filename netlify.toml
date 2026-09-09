@@ -50,7 +50,7 @@
   status = 200
 
 [[redirects]]
-  from = "/.netlify/functions/email-preferences"
+  from = "/api/email-preferences"
   to = "https://vtrdkoeydzvrhtiuykja.supabase.co/functions/v1/email-preferences"
   status = 200
   force = true

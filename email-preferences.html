@@ -32,7 +32,7 @@
     const intro = document.getElementById('intro');
     const updates = document.getElementById('updates');
     const marketing = document.getElementById('marketing');
-    const endpoint = '/.netlify/functions/email-preferences?token=' + encodeURIComponent(token);
+    const endpoint = '/api/email-preferences?token=' + encodeURIComponent(token);
     const setError = message => { status.textContent = message; status.className = 'status error'; };
     if (!token) setError('This preference link is incomplete. Please use the link in your email.');
     else fetch(endpoint).then(async response => {

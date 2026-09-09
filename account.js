@@ -16,6 +16,43 @@ const confirmationUrl = ['localhost', '127.0.0.1'].includes(location.hostname)
   ? `${siteUrl}/confirmation.html`
   : (config.appUrl || 'https://app.pravely.com');
 const recoveryUrl = `${siteUrl}/recovery.html`;
+const captchaSiteKey = config.captchaSiteKey || (
+  ['localhost', '127.0.0.1'].includes(location.hostname) ? '1x00000000000000000000AA' : ''
+);
+const captchaTokens = { signup: '', login: '', forgot: '' };
+const captchaWidgets = {};
+
+async function waitForTurnstile() {
+  if (!captchaSiteKey) return;
+  for (let attempt = 0; attempt < 100 && !window.turnstile; attempt += 1) {
+    await new Promise((resolve) => setTimeout(resolve, 50));
+  }
+  if (!window.turnstile) throw new Error('The security check could not load. Refresh the page and try again.');
+}
+
+async function setupCaptcha(name) {
+  if (!captchaSiteKey) return;
+  await waitForTurnstile();
+  captchaWidgets[name] = window.turnstile.render(`#${name}-captcha`, {
+    sitekey: captchaSiteKey,
+    theme: 'auto',
+    size: 'flexible',
+    callback: (token) => { captchaTokens[name] = token; },
+    'expired-callback': () => { captchaTokens[name] = ''; },
+    'error-callback': () => { captchaTokens[name] = ''; },
+  });
+}
+
+function requireCaptcha(name) {
+  if (!captchaSiteKey || captchaTokens[name]) return true;
+  showStatus(authStatus, 'Complete the security check before continuing.', 'bad');
+  return false;
+}
+
+function resetCaptcha(name) {
+  captchaTokens[name] = '';
+  if (captchaWidgets[name] !== undefined) window.turnstile?.reset(captchaWidgets[name]);
+}
 
 byId('year').textContent = new Date().getFullYear();
 
@@ -63,26 +100,32 @@ byId('last-name').addEventListener('input', updatePreviewAvatar);
 
 signupForm.addEventListener('submit', async (event) => {
   event.preventDefault(); clearStatus(authStatus); setBusy(signupForm, true, 'Creating account…');
+  if (!requireCaptcha('signup')) { setBusy(signupForm, false); return; }
   const firstName = byId('first-name').value.trim(), lastName = byId('last-name').value.trim();
   const { data, error } = await supabase.auth.signUp({
     email: byId('signup-email').value.trim(), password: byId('signup-password').value,
-    options: { emailRedirectTo: confirmationUrl, data: {
+    options: { emailRedirectTo: confirmationUrl, captchaToken: captchaTokens.signup || undefined, data: {
       first_name: firstName, last_name: lastName, full_name: `${firstName} ${lastName}`,
       avatar_initials: initials({ first_name: firstName, last_name: lastName }),
     } },
   });
+  resetCaptcha('signup');
   setBusy(signupForm, false);
   if (error) return showStatus(authStatus, error.message, 'bad');
   if (data.session) return renderSession(data.session);
   const email = byId('signup-email').value.trim();
-  location.assign(`./confirmation.html?sent=1&email=${encodeURIComponent(email)}`);
+  sessionStorage.setItem('pravely-confirmation-email', email);
+  location.assign('./confirmation.html?sent=1');
 });
 
 loginForm.addEventListener('submit', async (event) => {
   event.preventDefault(); clearStatus(authStatus); setBusy(loginForm, true, 'Logging in…');
+  if (!requireCaptcha('login')) { setBusy(loginForm, false); return; }
   const { data, error } = await supabase.auth.signInWithPassword({
     email: byId('login-email').value.trim(), password: byId('login-password').value,
+    options: captchaTokens.login ? { captchaToken: captchaTokens.login } : undefined,
   });
+  resetCaptcha('login');
   setBusy(loginForm, false);
   if (error) return showStatus(authStatus, error.message, 'bad');
   await renderSession(data.session);
@@ -90,17 +133,22 @@ loginForm.addEventListener('submit', async (event) => {
 
 forgotForm.addEventListener('submit', async (event) => {
   event.preventDefault(); clearStatus(authStatus); setBusy(forgotForm, true, 'Sending reset link…');
+  if (!requireCaptcha('forgot')) { setBusy(forgotForm, false); return; }
   const { error } = await supabase.auth.resetPasswordForEmail(byId('forgot-email').value.trim(), {
     redirectTo: recoveryUrl,
+    captchaToken: captchaTokens.forgot || undefined,
   });
+  resetCaptcha('forgot');
   setBusy(forgotForm, false);
   if (error) return showStatus(authStatus, error.message, 'bad');
-  location.assign(`./recovery.html?sent=1&email=${encodeURIComponent(byId('forgot-email').value.trim())}`);
+  sessionStorage.setItem('pravely-recovery-email', byId('forgot-email').value.trim());
+  location.assign('./recovery.html?sent=1');
 });
 
 changePasswordForm.addEventListener('submit', async (event) => {
   event.preventDefault(); clearStatus(accountStatus);
   const password = byId('new-password').value;
+  if (password.length < 12) return showStatus(accountStatus, 'Use at least 12 characters.', 'bad');
   if (password !== byId('confirm-password').value) return showStatus(accountStatus, 'The passwords do not match.', 'bad');
   setBusy(changePasswordForm, true, 'Updating password…');
   const { error } = await supabase.auth.updateUser({ password });
@@ -139,3 +187,10 @@ supabase.auth.onAuthStateChange((_event, session) => { renderSession(session); }
 const { data: { session } } = await supabase.auth.getSession();
 await renderSession(session);
 if (location.hash === '#forgot' && !session) showAuthForm('forgot');
+else if (location.hash === '#signup' && !session) showAuthForm('signup');
+
+try {
+  await Promise.all(['signup', 'login', 'forgot'].map(setupCaptcha));
+} catch (error) {
+  showStatus(authStatus, error.message || 'The security check could not load.', 'bad');
+}

@@ -1,21 +1,22 @@
 /**
  * get-download — the customer-facing lookup behind download.html.
  *
- *   GET ?license=PRV-7K4X9P2M    → the email link (stable, bookmarkable)
+ *   GET ?capability=<256-bit token> → the email link (rotated after use)
  *   GET ?session_id=cs_test_...  → the post-checkout redirect (polls until
  *                                   the webhook has issued the license)
  *
  * Never returns a permanent public URL: it mints a fresh *temporary* signed
- * URL on each call (default 72h TTL) and hands it to the browser. Access is
+ * URL on each call (default 10-minute TTL) and hands it to the browser. Access is
  * rate-limited per license (rolling 24h) so a leaked license id can't be
  * farmed into a download service.
  */
 
 import { handleOptions, jsonResponse } from '../_shared/cors.ts';
-import { dailyDownloadLimit, downloadLinkTtlSeconds, getProduct, siteUrl } from '../_shared/config.ts';
+import { dailyDownloadLimit, downloadLinkTtlSeconds, envGet, getProduct, ipDownloadLimit, siteUrl } from '../_shared/config.ts';
 import { getSupabase } from '../_shared/supabase.ts';
 import { logLicenseEvent, STEPS } from '../_shared/audit.ts';
 import { personalizeWorkbook } from '../_shared/personalize.ts';
+import { generateDownloadCapability, hashDownloadCapability } from '../_shared/license.ts';
 
 interface LicenseRow {
   license_id: string;
@@ -32,6 +33,8 @@ interface LicenseRow {
   issued_version: string | null;
   user_id: string | null;
   license_source: 'purchase' | 'account_free';
+  download_capability_hash: string | null;
+  checkout_handoff_consumed_at: string | null;
 }
 
 interface ReleaseRow {
@@ -50,17 +53,25 @@ Deno.serve(async (req: Request) => {
 
   try {
     const url = new URL(req.url);
+    const capabilityParam = url.searchParams.get('capability');
     const licenseParam = url.searchParams.get('license');
     const sessionParam = url.searchParams.get('session_id');
     const sb = getSupabase();
 
     let query = sb.from('licenses').select('*').limit(1);
-    if (licenseParam) {
-      query = query.eq('license_id', licenseParam.trim().toUpperCase());
+    if (capabilityParam) {
+      if (!/^[A-Za-z0-9_-]{43}$/.test(capabilityParam)) {
+        return jsonResponse({ status: 'unauthorized', message: 'This download link is invalid.' }, 401, req);
+      }
+      query = query.eq('download_capability_hash', await hashDownloadCapability(capabilityParam));
+    } else if (licenseParam) {
+      // One-time compatibility exchange for links issued before capabilities.
+      // Once a capability is set, the short license id can never be used again.
+      query = query.eq('license_id', licenseParam.trim().toUpperCase()).is('download_capability_hash', null);
     } else if (sessionParam) {
-      query = query.eq('stripe_session_id', sessionParam.trim());
+      query = query.eq('stripe_session_id', sessionParam.trim()).is('checkout_handoff_consumed_at', null);
     } else {
-      return jsonResponse({ error: 'Pass ?license= or ?session_id=' }, 400, req);
+      return jsonResponse({ error: 'Pass ?capability= or ?session_id=' }, 400, req);
     }
 
     const { data: row, error } = await query.maybeSingle<LicenseRow>();
@@ -108,6 +119,26 @@ Deno.serve(async (req: Request) => {
         message: 'Download limit reached — please try again tomorrow or contact support.',
         contact: 'support@pravely.com',
       }, 429, req);
+    }
+
+    const networkAddress = req.headers.get('cf-connecting-ip') || req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || '';
+    const rateSalt = envGet('DOWNLOAD_RATE_LIMIT_SALT') || envGet('SUPABASE_SERVICE_ROLE_KEY');
+    const networkHash = networkAddress && rateSalt
+      ? await hashDownloadCapability(`${rateSalt}:${networkAddress}`)
+      : '';
+    if (networkHash) {
+      const { count: networkCount } = await sb.from('license_events')
+        .select('id', { count: 'exact', head: true })
+        .eq('step', STEPS.downloadServed)
+        .gte('created_at', dayAgo)
+        .like('detail', `%network:${networkHash}%`);
+      if ((networkCount ?? 0) >= ipDownloadLimit()) {
+        return jsonResponse({
+          status: 'rate_limited',
+          message: 'Too many download requests. Please try again tomorrow or contact support.',
+          contact: 'support@pravely.com',
+        }, 429, req);
+      }
     }
 
     const product = getProduct(row.product);
@@ -174,17 +205,33 @@ Deno.serve(async (req: Request) => {
       return jsonResponse({ status: 'error', message: 'Could not prepare your download. Please try again.' }, 500, req);
     }
 
-    const { error: updErr } = await sb
+    const nextCapability = generateDownloadCapability();
+    const nextCapabilityHash = await hashDownloadCapability(nextCapability);
+    let rotationQuery = sb
       .from('licenses')
-      .update({ download_count: (row.download_count ?? 0) + 1, last_download_at: new Date().toISOString() })
+      .update({
+        download_count: (row.download_count ?? 0) + 1,
+        last_download_at: new Date().toISOString(),
+        download_capability_hash: nextCapabilityHash,
+        download_capability_rotated_at: new Date().toISOString(),
+        ...(sessionParam ? { checkout_handoff_consumed_at: new Date().toISOString() } : {}),
+      })
       .eq('license_id', row.license_id);
-    if (updErr) console.error('get-download: count update failed:', updErr);
+    rotationQuery = row.download_capability_hash
+      ? rotationQuery.eq('download_capability_hash', row.download_capability_hash)
+      : rotationQuery.is('download_capability_hash', null);
+    const { data: rotated, error: updErr } = await rotationQuery
+      .select('license_id')
+      .maybeSingle();
+    if (updErr || !rotated) {
+      throw new Error(`Download capability rotation failed${updErr ? `: ${updErr.message}` : ': the link was already used'}`);
+    }
 
     await logLicenseEvent(sb, {
       licenseId: row.license_id,
       step: STEPS.downloadServed,
       status: 'ok',
-      detail: `${downloadLinkTtlSeconds()}s ttl · download #${(row.download_count ?? 0) + 1}`,
+      detail: `${downloadLinkTtlSeconds()}s ttl · download #${(row.download_count ?? 0) + 1}${networkHash ? ` · network:${networkHash}` : ''}`,
     });
 
     return jsonResponse({
@@ -196,6 +243,7 @@ Deno.serve(async (req: Request) => {
       fileName,
       version: issuedVersion,
       downloadUrl: signed.signedUrl,
+      nextCapability,
       expiresInSeconds: downloadLinkTtlSeconds(),
       siteUrl: siteUrl(),
     }, 200, req);

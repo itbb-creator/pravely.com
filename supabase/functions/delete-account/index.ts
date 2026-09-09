@@ -1,5 +1,6 @@
 import { handleOptions, jsonResponse, readJson } from '../_shared/cors.ts';
 import { getSupabase } from '../_shared/supabase.ts';
+import { deleteCustomerData, recordBlockedAdminDeletion } from '../_shared/delete-customer-data.ts';
 
 Deno.serve(async (req: Request) => {
   const options = handleOptions(req);
@@ -17,15 +18,16 @@ Deno.serve(async (req: Request) => {
     const { data, error: authError } = await sb.auth.getUser(token);
     const user = data.user;
     if (authError || !user?.id) return jsonResponse({ error: 'Your session is no longer valid.' }, 401, req);
+    if (user.app_metadata?.role === 'admin') {
+      await recordBlockedAdminDeletion(sb, user.id, 'account');
+      return jsonResponse({ error: 'Administrator accounts are protected and cannot be deleted.' }, 403, req);
+    }
 
-    const { data: freeFiles } = await sb.from('licenses').select('file_path')
-      .eq('user_id', user.id).eq('license_source', 'account_free').not('file_path', 'is', null);
-    const paths = (freeFiles ?? []).map((item) => String(item.file_path)).filter(Boolean);
-    if (paths.length) await sb.storage.from('licensed-workbooks').remove(paths);
+    const deletion = await deleteCustomerData(sb, user.id, 'account');
 
     const { error: deleteError } = await sb.auth.admin.deleteUser(user.id);
     if (deleteError) throw deleteError;
-    return jsonResponse({ deleted: true }, 200, req);
+    return jsonResponse({ deleted: true, deletionJobId: deletion.jobId }, 200, req);
   } catch (error) {
     console.error('delete-account error:', error);
     return jsonResponse({ error: 'Account deletion could not be completed.' }, 500, req);

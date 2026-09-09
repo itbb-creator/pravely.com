@@ -1,7 +1,6 @@
 import { handleOptions, jsonResponse, readJson } from '../_shared/cors.ts';
 import { getSupabase } from '../_shared/supabase.ts';
-
-const TABLES = ['budget_entries', 'debts', 'net_worth_items', 'goals', 'app_feedback', 'push_device_tokens', 'user_settings'] as const;
+import { deleteCustomerData, recordBlockedAdminDeletion } from '../_shared/delete-customer-data.ts';
 
 Deno.serve(async (req: Request) => {
   const options = handleOptions(req);
@@ -14,18 +13,14 @@ Deno.serve(async (req: Request) => {
     const sb = getSupabase();
     const { data, error } = await sb.auth.getUser(token);
     if (error || !data.user?.id) return jsonResponse({ error: 'Your session is no longer valid.' }, 401, req);
-    for (const table of TABLES) {
-      const { error: deleteError } = await sb.from(table).delete().eq('user_id', data.user.id);
-      if (deleteError) throw deleteError;
+    if (data.user.app_metadata?.role === 'admin') {
+      await recordBlockedAdminDeletion(sb, data.user.id, 'financial_data');
+      return jsonResponse({
+        error: 'Administrator accounting data is protected and cannot be erased through self-service controls.',
+      }, 403, req);
     }
-    const verification = await Promise.all(
-      TABLES.map((table) => sb.from(table).select('user_id', { count: 'exact', head: true }).eq('user_id', data.user.id)),
-    );
-    const remaining = verification.reduce((sum, result) => sum + (result.count ?? 0), 0);
-    if (verification.some((result) => result.error) || remaining > 0) {
-      throw new Error('Data deletion verification failed.');
-    }
-    return jsonResponse({ deleted: true }, 200, req);
+    const result = await deleteCustomerData(sb, data.user.id, 'financial_data');
+    return jsonResponse({ deleted: true, deletionJobId: result.jobId }, 200, req);
   } catch (error) {
     console.error('delete-user-data error:', error);
     return jsonResponse({ error: 'Financial data deletion could not be completed.' }, 500, req);

@@ -5,8 +5,13 @@ const supabase = createClient(config.supabaseUrl, config.supabasePublishableKey,
   auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },
 });
 const params = new URLSearchParams(location.search);
-const email = params.get('email');
-if (email) document.getElementById('email').textContent = email;
+const email = sessionStorage.getItem('pravely-confirmation-email');
+if (email) {
+  const [local, domain = ''] = email.split('@');
+  document.getElementById('email').textContent = `${local.slice(0, 2)}${local.length > 2 ? '•••' : ''}@${domain}`;
+  sessionStorage.removeItem('pravely-confirmation-email');
+}
+if (params.has('email')) history.replaceState({}, '', `./confirmation.html${params.has('sent') ? '?sent=1' : ''}`);
 document.getElementById('open-app').href = config.appUrl || 'https://app.pravely.com';
 document.getElementById('waiting-open-app').href = config.appUrl || 'https://app.pravely.com';
 

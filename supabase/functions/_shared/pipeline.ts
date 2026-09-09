@@ -19,7 +19,7 @@
  */
 
 import { getProduct, BUCKETS, siteUrl, supportEmail, downloadLinkTtlSeconds } from './config.ts';
-import { generateLicenseId } from './license.ts';
+import { generateDownloadCapability, generateLicenseId, hashDownloadCapability } from './license.ts';
 import { personalizeWorkbook, type PersonalizeResult } from './personalize.ts';
 import { dispatchWelcomeEmail, type WelcomeEmailContext } from './email.ts';
 import { getSupabase } from './supabase.ts';
@@ -79,7 +79,9 @@ export async function runLicensePipeline(purchase: PurchaseInfo): Promise<Pipeli
       licenseId: existing.license_id,
       fileName: '',
       signedUrl: '',
-      downloadPageUrl: `${siteUrl()}/download.html?license=${existing.license_id}`,
+      // The raw capability is intentionally unrecoverable. A repeated webhook
+      // must not recreate a bearer link from the short customer-facing id.
+      downloadPageUrl: `${siteUrl()}/account.html`,
       email: { provider: 'skipped' },
       replacements: [],
     };
@@ -115,6 +117,12 @@ export async function runLicensePipeline(purchase: PurchaseInfo): Promise<Pipeli
     license_source: purchase.licenseSource ?? 'purchase',
     status: 'pending',
   };
+  const downloadCapability = generateDownloadCapability();
+  const downloadCapabilityHash = await hashDownloadCapability(downloadCapability);
+  Object.assign(rowUpsert, {
+    download_capability_hash: downloadCapabilityHash,
+    download_capability_rotated_at: new Date().toISOString(),
+  });
   const { error: upsertErr } = existing
     ? await sb.from('licenses').update(rowUpsert).eq('license_id', licenseId)
     : await sb.from('licenses').insert(rowUpsert);
@@ -199,7 +207,7 @@ export async function runLicensePipeline(purchase: PurchaseInfo): Promise<Pipeli
   });
 
   // 6. Welcome email (log provider until a provider is connected).
-  const downloadPageUrl = `${siteUrl()}/download.html?license=${licenseId}`;
+  const downloadPageUrl = `${siteUrl()}/download.html?capability=${encodeURIComponent(downloadCapability)}`;
   const emailCtx: WelcomeEmailContext = {
     productName: product.name,
     customerName: purchase.customerName,

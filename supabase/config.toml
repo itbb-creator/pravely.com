@@ -3,7 +3,16 @@
 [auth]
 site_url = "https://app.pravely.com"
 additional_redirect_urls = ["https://app.pravely.com", "https://app.pravely.com/**", "https://pravely.com/account.html", "https://pravely.com/confirmation.html", "https://pravely.com/recovery.html", "https://pravelyapp.netlify.app/**", "http://localhost:4173/account.html", "http://127.0.0.1:4174/confirmation.html", "http://127.0.0.1:4174/recovery.html"]
-minimum_password_length = 8
+minimum_password_length = 12
+
+[auth.sessions]
+# Require re-authentication after one hour without activity.
+inactivity_timeout = "1h"
+
+[auth.captcha]
+enabled = true
+provider = "turnstile"
+secret = "env(SUPABASE_AUTH_CAPTCHA_SECRET)"
 
 [auth.mfa.totp]
 enroll_enabled = true

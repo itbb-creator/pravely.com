@@ -4,14 +4,22 @@
  * is set, the pipeline stores the rendered HTML on the license record; this
  * endpoint lets you see it.
  *
- *   GET ?license=PRV-7K4X9P2M&key=<ADMIN_KEY>
- *
- * ADMIN_KEY is a secret you set in the function secrets.
+ *   GET ?license=PRV-7K4X9P2M with an authenticated administrator JWT.
  */
 
-import { handleOptions, jsonResponse } from '../_shared/cors.ts';
-import { envGet } from '../_shared/config.ts';
+import { corsHeaders, handleOptions, jsonResponse } from '../_shared/cors.ts';
 import { getSupabase } from '../_shared/supabase.ts';
+
+function assuranceLevel(token: string): string {
+  try {
+    const payload = token.split('.')[1] ?? '';
+    const normalized = payload.replaceAll('-', '+').replaceAll('_', '/');
+    const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, '=');
+    return String(JSON.parse(atob(padded))?.aal ?? '');
+  } catch {
+    return '';
+  }
+}
 
 Deno.serve(async (req: Request) => {
   const options = handleOptions(req);
@@ -21,14 +29,17 @@ Deno.serve(async (req: Request) => {
     return jsonResponse({ error: 'Method not allowed' }, 405, req);
   }
 
-  const adminKey = envGet('ADMIN_KEY');
-  if (!adminKey) {
-    return jsonResponse({ error: 'ADMIN_KEY not configured in function secrets' }, 503, req);
-  }
-
   const url = new URL(req.url);
-  if (url.searchParams.get('key') !== adminKey) {
+  const token = req.headers.get('Authorization')?.replace(/^Bearer\s+/i, '') ?? '';
+  const sb = getSupabase();
+  const { data: authData, error: authError } = token
+    ? await sb.auth.getUser(token)
+    : { data: { user: null }, error: new Error('Missing authorization') };
+  if (authError || !authData.user || authData.user.app_metadata?.role !== 'admin') {
     return jsonResponse({ error: 'Unauthorized' }, 401, req);
+  }
+  if (assuranceLevel(token) !== 'aal2') {
+    return jsonResponse({ error: 'MFA verification required.' }, 403, req);
   }
 
   const licenseId = (url.searchParams.get('license') ?? '').trim().toUpperCase();
@@ -36,7 +47,6 @@ Deno.serve(async (req: Request) => {
     return jsonResponse({ error: 'Pass ?license=' }, 400, req);
   }
 
-  const sb = getSupabase();
   const { data, error } = await sb
     .from('licenses')
     .select('license_id, customer_email, email_status, email_provider, email_preview_html')
@@ -54,7 +64,10 @@ Deno.serve(async (req: Request) => {
     status: 200,
     headers: {
       'Content-Type': 'text/html; charset=utf-8',
-      ...(req.headers.get('origin') ? { 'Access-Control-Allow-Origin': url.origin } : {}),
+      'Cache-Control': 'private, no-store',
+      'Content-Security-Policy': "default-src 'none'; img-src data: https:; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
+      'X-Content-Type-Options': 'nosniff',
+      ...corsHeaders(req),
     },
   });
 });

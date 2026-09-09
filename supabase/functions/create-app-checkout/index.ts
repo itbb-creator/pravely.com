@@ -22,7 +22,9 @@ Deno.serve(async (req: Request) => {
     if (entitlement?.status === 'active' && entitlement.plan_id === body.plan) return jsonResponse({ error: 'You already own this plan.' }, 409, req);
     const isCompleteUpgrade = body.plan === 'complete' && entitlement?.status === 'active' && entitlement.plan_id === 'plus';
     const priceEnv = isCompleteUpgrade ? 'STRIPE_PRICE_APP_COMPLETE_UPGRADE' : PRICES[body.plan];
-    const priceId = envGet(priceEnv);
+    // Preview keeps its Stripe catalog isolated with suffixed secret names.
+    // Production continues to use the established unsuffixed names.
+    const priceId = envGet(`${priceEnv}_PREVIEW`) || envGet(priceEnv);
     if (!priceId) return jsonResponse({ error: 'App checkout is not configured yet.' }, 503, req);
 
     const stripe = new Stripe(envGet('STRIPE_SECRET_KEY'), { apiVersion: '2025-02-24.acacia', httpClient: Stripe.createFetchHttpClient() });

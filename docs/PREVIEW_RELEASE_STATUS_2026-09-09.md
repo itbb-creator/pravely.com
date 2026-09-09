@@ -138,6 +138,13 @@ Only after steps 1–10 are resolved or formally accepted:
 
 ## Items still incomplete
 
+### Credential and catalog checkpoint — 2026-09-09
+
+- The `security-preview` branch now contains only the three intended app Price IDs: Plus ($89), Complete ($159), and Plus-to-Complete upgrade ($70). The secrets use `_PREVIEW` suffixes, and `create-app-checkout` now supports those preview-only names while preserving the production names.
+- The corrected `create-app-checkout` function was deployed only to the `security-preview` Supabase branch. Netlify and production were not deployed.
+- The Cloudflare Turnstile public site key was added to the local preview app environment and source configuration. The matching private Turnstile secret still must be confirmed in the preview Auth CAPTCHA settings.
+- Stripe, OpenAI, and purchase-email positive-path tests remain pending because the five-hour usage window reached the agreed stopping threshold. The purchase-email path is a legacy workbook flow and is not exercised by the three app-price checkout flow.
+
 The following are the complete remaining items from this chat—not hidden omissions:
 
 1. Leaked-password protection toggle and its follow-up rejection test.
@@ -151,4 +158,3 @@ The following are the complete remaining items from this chat—not hidden omiss
 9. Privacy/legal approval for AI processing and record retention.
 10. Native iOS/Xcode/device verification.
 11. Production migration/configuration/secret rollout and the one final Netlify deployment. This was deliberately not attempted.
-

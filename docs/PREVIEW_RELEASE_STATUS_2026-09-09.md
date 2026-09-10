@@ -145,6 +145,20 @@ Only after steps 1–10 are resolved or formally accepted:
 - The Cloudflare Turnstile public site key was added to the local preview app environment and source configuration. The matching private Turnstile secret still must be confirmed in the preview Auth CAPTCHA settings.
 - Stripe, OpenAI, and purchase-email positive-path tests remain pending because the five-hour usage window reached the agreed stopping threshold. The purchase-email path is a legacy workbook flow and is not exercised by the three app-price checkout flow.
 
+### Live deploy-preview checkpoint — 2026-09-09
+
+- App preview: `https://deploy-preview-1--pravelyapp.netlify.app`
+- Marketing preview: `https://deploy-preview-11--timely-palmier-9a6a82.netlify.app` (Netlify team-login protection is enabled).
+- GitHub review branches remain unmerged: `itbb-creator/Pravely#1` and `itbb-creator/pravely.com#11`.
+- The compiled app preview was verified to contain the `security-preview` Supabase reference and no production Supabase reference.
+- The deploy preview uses Cloudflare's official always-pass public test key, paired with the preview Auth test secret. The real Turnstile public key remains in source/local configuration for approved real hostnames.
+- Browser smoke testing confirmed CAPTCHA success and an enabled sign-in action.
+- Automated preview testing passed CAPTCHA enforcement, the 12-character hosted password minimum, signup-confirmation requirements, forgot-password request privacy, all three Stripe app Checkout Session paths, unsigned-webhook rejection, RLS ownership isolation, first-login persistence, TOTP/AAL2, data/account deletion, Storage cleanup, administrator protections, and rotating 10-minute download capabilities.
+- Direct database SSL enforcement was independently queried and is enabled.
+- Health Coach reaches OpenAI but is blocked by `credit_balance_exhausted`; add API credit to the preview OpenAI project and rerun the positive test.
+- Supabase leaked-password protection is still disabled and must be enabled in hosted Auth settings.
+- A controlled confirmation email was sent to the authorized Gmail test inbox through a unique plus-addressed alias. A disposable Plus-plan Stripe Checkout Session was also opened for manual test completion; confirmation and payment/webhook verification remain pending.
+
 The following are the complete remaining items from this chat—not hidden omissions:
 
 1. Leaked-password protection toggle and its follow-up rejection test.

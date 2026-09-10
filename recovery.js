@@ -6,7 +6,13 @@ const supabase = createClient(config.supabaseUrl, config.supabasePublishableKey,
 });
 const byId = (id) => document.getElementById(id);
 const params = new URLSearchParams(location.search);
-if (params.get('email')) byId('email').textContent = params.get('email');
+const recoveryEmail = sessionStorage.getItem('pravely-recovery-email');
+if (recoveryEmail) {
+  const [local, domain = ''] = recoveryEmail.split('@');
+  byId('email').textContent = `${local.slice(0, 2)}${local.length > 2 ? '•••' : ''}@${domain}`;
+  sessionStorage.removeItem('pravely-recovery-email');
+}
+if (params.has('email')) history.replaceState({}, '', `./recovery.html${params.has('sent') ? '?sent=1' : ''}`);
 let recoveryAuthorized = false;
 const hash = new URLSearchParams(location.hash.slice(1));
 const recoveryIntent =
@@ -80,6 +86,7 @@ if (['localhost', '127.0.0.1'].includes(location.hostname) && params.has('previe
 byId('reset-form').addEventListener('submit', async (event) => {
   event.preventDefault();
   const password = byId('password').value;
+  if (password.length < 12) return status('Use at least 12 characters.', true);
   if (password !== byId('confirm-password').value) return status('The passwords do not match.', true);
   if (!recoveryAuthorized) return status('This reset link is no longer valid. Request a new link and try again.', true);
   const button = event.currentTarget.querySelector('button');
@@ -89,7 +96,7 @@ byId('reset-form').addEventListener('submit', async (event) => {
   if (error) return status(error.message, true);
   await supabase.auth.signOut();
   show('invalid');
-  byId('invalid').innerHTML = '<h1>Password updated</h1><p>Your password has been changed. Sign in with your new password to continue.</p><a class="button" href="./account.html">Sign in to Pravely</a>';
+  byId('invalid').innerHTML = '<h1>Password updated</h1><p>Your password has been changed. Sign in with your new password to continue.</p><a class="button" href="https://app.pravely.com/">Sign in to Pravely</a>';
   status('Your account is secure and ready.', false);
   history.replaceState({}, '', './recovery.html?complete=1');
 });

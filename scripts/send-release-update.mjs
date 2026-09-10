@@ -55,7 +55,7 @@ for (const license of licenses) {
       to: [license.customer_email],
       ...message,
       headers: {
-        'List-Unsubscribe': `<${siteUrl}/.netlify/functions/email-preferences?token=${encodeURIComponent(license.unsubscribe_token)}>`,
+        'List-Unsubscribe': `<${siteUrl}/api/email-preferences?token=${encodeURIComponent(license.unsubscribe_token)}>`,
         'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
       },
     }),

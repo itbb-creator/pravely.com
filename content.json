@@ -3,6 +3,7 @@
   "contactEmail": "support@pravely.com",
   "supabaseUrl": "https://vtrdkoeydzvrhtiuykja.supabase.co",
   "supabasePublishableKey": "sb_publishable_bbOnYkVtIaUQ-droE1k0yA_e_AF8xO4",
+  "captchaSiteKey": "0x4AAAAAAEt8971O6gT1siud",
   "price": "$19",
   "compareAtPrice": "$29",
   "stripePaymentLink": "#",

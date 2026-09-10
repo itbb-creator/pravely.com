@@ -71,16 +71,22 @@ export function supportEmail(): string {
   return envGet('SUPPORT_EMAIL', 'support@pravely.com');
 }
 
-/** Seconds a signed download URL stays valid (default 72h). */
+/** Seconds a signed download URL stays valid (default 10 minutes). */
 export function downloadLinkTtlSeconds(): number {
-  const hours = Number(envGet('DOWNLOAD_LINK_TTL_HOURS', '72'));
-  return Math.max(1, Math.min(hours || 72, 24 * 7)) * 3600;
+  const minutes = Number(envGet('DOWNLOAD_LINK_TTL_MINUTES', '10'));
+  return Math.max(5, Math.min(minutes || 10, 15)) * 60;
 }
 
 /** Max fresh signed links minted per license per rolling 24h. */
 export function dailyDownloadLimit(): number {
   const n = Number(envGet('DAILY_DOWNLOAD_LIMIT', '20'));
   return Math.max(1, Math.min(n || 20, 1000));
+}
+
+/** Max links minted for one privacy-hashed network address per rolling 24h. */
+export function ipDownloadLimit(): number {
+  const n = Number(envGet('IP_DOWNLOAD_LIMIT', '40'));
+  return Math.max(5, Math.min(n || 40, 500));
 }
 
 /**

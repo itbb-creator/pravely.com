@@ -109,9 +109,9 @@ alter table public.stripe_events  enable row level security;
 drop policy if exists "Licensed files: service role only" on storage.objects;
 create policy "Licensed files: service role only"
   on storage.objects for all
+  to service_role
   using (bucket_id in ('workbook-masters', 'licensed-workbooks'))
-  with check (bucket_id in ('workbook-masters', 'licensed-workbooks'))
-  to service_role;
+  with check (bucket_id in ('workbook-masters', 'licensed-workbooks'));
 
 -- ----------------------------------------------------------------------------
 -- Keep updated_at fresh.

@@ -138,11 +138,16 @@ select * from license_audit where license_id = 'PRV-XXXXXXXX';
 ### 8. Email (later — the pipeline is already ready)
 
 Until you connect a provider, emails are **rendered and stored** on each
-license record (status `queued`). See exactly what the customer would get:
+license record (status `queued`). An authenticated administrator can inspect
+the preview by sending their current Supabase access token in the header:
 
+```bash
+curl -H "Authorization: Bearer YOUR_SHORT_LIVED_ADMIN_ACCESS_TOKEN" \
+  "https://YOUR-PROJECT-REF.supabase.co/functions/v1/preview-email?license=PRV-XXXXXXXX"
 ```
-https://YOUR-PROJECT-REF.supabase.co/functions/v1/preview-email?license=PRV-XXXXXXXX&key=YOUR_ADMIN_KEY
-```
+
+The user behind the token must have `app_metadata.role` set to `admin`. Never
+place an administrator token or durable secret in a URL.
 
 When you're ready (recommended: [resend.com](https://resend.com), free tier
 3,000/mo, 1-line API):

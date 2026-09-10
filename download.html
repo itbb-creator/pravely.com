@@ -109,7 +109,7 @@
             <a class="btn ghost" id="btn-video" href="./onboarding#video-player">Watch How-To Video/Quick Start Guide</a>
           </div>
         </div>
-        <p class="note">For security, download links expire — this page creates a fresh one each time you visit, so <b>bookmark it</b>. It's also where future workbook updates will be delivered.</p>
+        <p class="note">For security, file links expire within 15 minutes and this page rotates its private access code after each successful request. Bookmark the updated page after it finishes loading.</p>
       </div>
 
       <!-- State: failed -->
@@ -129,6 +129,7 @@
     (async function () {
       var $ = function (id) { return document.getElementById(id); };
       var params = new URLSearchParams(window.location.search);
+      var capability = params.get('capability');
       var license = params.get('license');
       var sessionId = params.get('session_id');
 
@@ -164,7 +165,9 @@
           fail('Workbook delivery is still being connected. Email support@pravely.com and we\'ll help you access your licensed copy.');
           return;
         }
-        var q = license
+        var q = capability
+          ? 'capability=' + encodeURIComponent(capability)
+          : license
           ? 'license=' + encodeURIComponent(license.trim().toUpperCase())
           : 'session_id=' + encodeURIComponent(sessionId || '');
         if (!q) { fail('No license or session was found in this link. Use the link from your email.'); return; }
@@ -175,6 +178,12 @@
           .then(function (r) { return r.json(); })
           .then(function (data) {
             if (data.status === 'ready') {
+              if (data.nextCapability) {
+                capability = data.nextCapability;
+                license = null;
+                sessionId = null;
+                history.replaceState({}, '', './download.html?capability=' + encodeURIComponent(capability));
+              }
               $('ready-name').textContent = (data.customerName || 'there').split(' ')[0];
               $('ready-license').textContent = data.licenseId;
               $('ready-product').textContent = data.productName;
@@ -193,7 +202,7 @@
               polling = true;
               setTimeout(tryLookup, (data.retryInSeconds || 3) * 1000);
             } else if (data.status === 'unauthorized') {
-              $('fail-action').href = './account.html';
+              $('fail-action').href = 'https://app.pravely.com/';
               $('fail-action').textContent = 'Sign in to Pravely';
               fail(data.message || 'Sign in to access this licensed workbook.');
             } else if (data.status === 'rate_limited' || data.status === 'failed') {

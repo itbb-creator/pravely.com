@@ -39,6 +39,24 @@ export function generateLicenseId(
   return out;
 }
 
+/** A URL-safe 256-bit customer download capability. Never store this value. */
+export function generateDownloadCapability(): string {
+  const bytes = new Uint8Array(32);
+  crypto.getRandomValues(bytes);
+  return btoa(String.fromCharCode(...bytes))
+    .replaceAll('+', '-')
+    .replaceAll('/', '_')
+    .replace(/=+$/, '');
+}
+
+/** Hash a capability before lookup/storage so database access reveals no link. */
+export async function hashDownloadCapability(value: string): Promise<string> {
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(value));
+  return Array.from(new Uint8Array(digest))
+    .map((byte) => byte.toString(16).padStart(2, '0'))
+    .join('');
+}
+
 /** True if a string looks like a license ID we issued. */
 export function isLicenseId(value: string): boolean {
   const matchedPrefix = [LICENSE_PREFIX, 'ITB-'].find((prefix) => value.startsWith(prefix));

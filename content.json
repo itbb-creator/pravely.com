@@ -1,37 +1,31 @@
 {
-  "_comment": "EDIT THIS FILE TO CHANGE YOUR SITE — pricing, Stripe links, email. No HTML needed. Replace # with your real Stripe Payment Links when ready.",
+  "_comment": "Public site configuration for Pravely account access and support.",
   "contactEmail": "support@pravely.com",
   "supabaseUrl": "https://vtrdkoeydzvrhtiuykja.supabase.co",
   "supabasePublishableKey": "sb_publishable_bbOnYkVtIaUQ-droE1k0yA_e_AF8xO4",
   "captchaSiteKey": "0x4AAAAAAEt8971O6gT1siud",
-  "price": "$19",
-  "compareAtPrice": "$29",
-  "stripePaymentLink": "#",
   "functionsBaseUrl": "https://vtrdkoeydzvrhtiuykja.supabase.co/functions/v1",
   "appUrl": "https://app.pravely.com",
-  "stripeLinks": {
-    "essentials": "#",
-    "complete": "#",
-    "premium": "#"
-  },
   "pricing": {
     "essentials": {
       "name": "Pravely Essentials",
-      "price": "$19",
-      "compareAt": "$29",
-      "blurb": "Monthly Clarity"
+      "price": "Included",
+      "blurb": "Included with a free Pravely account"
+    },
+    "plus": {
+      "name": "Pravely Plus",
+      "price": "$89",
+      "blurb": "One-time purchase"
     },
     "complete": {
       "name": "Pravely Complete",
-      "price": "$39",
-      "blurb": "Debt & Asset Engine"
+      "price": "$159",
+      "blurb": "One-time purchase"
     },
-    "premium": {
-      "name": "Pravely Premium",
-      "price": "$36",
-      "compareAt": "$49",
-      "blurb": "The Financial System",
-      "hook": "Founding customer offer"
+    "upgrade": {
+      "name": "Plus to Complete upgrade",
+      "price": "$70",
+      "blurb": "One-time purchase"
     }
   },
   "socialLinks": {

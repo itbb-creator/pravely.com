@@ -49,6 +49,9 @@ verify_jwt = false
 [functions.email-preferences]
 verify_jwt = false
 
+[functions.submit-support]
+verify_jwt = false
+
 [functions.claim-essentials]
 verify_jwt = true
 

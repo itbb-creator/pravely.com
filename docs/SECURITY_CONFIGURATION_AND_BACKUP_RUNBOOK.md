@@ -2,6 +2,8 @@
 
 This runbook covers the security work that cannot be completed safely from source code alone. Complete these steps in a non-production or preview environment first. Never paste a secret into source control, a URL, a support ticket, or a screenshot.
 
+Pravely is operated by one owner. Wherever an older checklist says “IT officer,” “security officer,” or “second administrator,” read it as **the owner/operator** unless a genuinely independent recovery identity is specifically required. The current launch catalog is **three paid app offers** (Plus, Complete, and the Plus-to-Complete upgrade) plus the **free Essentials launch offer**. Legacy workbook-delivery files may remain only to support prior customers and records; they are not the current direct-sales catalog.
+
 ## 1. Activate Cloudflare Turnstile CAPTCHA
 
 Code support is present for sign-up, sign-in, and password recovery on both the app and the legacy account page. The isolated Supabase preview branch uses Cloudflare's official test site key and test secret so automated and localhost flows are deterministic. Production must use a real widget and secret.
@@ -57,7 +59,7 @@ Supabase database backups do not include Storage objects. Use a different securi
 Recommended baseline:
 
 - Destination: a separate cloud account or provider with object versioning, server-side encryption, and object-lock/immutability support.
-- Scope: all objects under the private `business-receipts` bucket and every master workbook source. Generated customer workbooks may be regenerated when master workbooks and license data are recoverable.
+- Scope: all objects under the private `business-receipts` bucket, the current free Essentials source, and any legacy source file that must be retained to support an existing customer or record. Generated customer workbooks may be regenerated when their source and license data are recoverable.
 - Credentials: a write-only backup identity for daily copies and a separate, offline recovery identity. Neither belongs in browser code.
 - Schedule: incremental copy at least daily; monitor the age of the latest successful run and source/destination object counts.
 - Retention: keep version history and deletion protection according to legal/accounting advice. Receipt retention may be jurisdiction-specific.
@@ -71,7 +73,68 @@ Automation design:
 4. A separate restore command requires an operator-selected destination and never overwrites production automatically.
 5. Use provider-native immutable retention where available; an AI agent must not possess authority to shorten retention or delete backups.
 
-Choosing and connecting the independent provider is still required before this automation can be implemented. Appropriate options include a separately owned S3-compatible account with Object Lock, Google Cloud Storage with Bucket Lock, or Azure Blob immutable storage.
+### AWS S3 identities and secrets
+
+These steps assume the independent destination is AWS S3. Replace every value in angle brackets before saving a policy.
+
+1. Sign in to the AWS account that owns the backup bucket, use the console search bar to open **IAM**, then choose **Users → Create user**.
+2. Name the daily identity `pravely-backup-writer`. Do not select console access. Create the user, open it, then choose **Permissions → Add permissions → Create inline policy → JSON**.
+3. Give the writer only `s3:ListBucket` on `arn:aws:s3:::<BACKUP_BUCKET>` and `s3:PutObject` on `arn:aws:s3:::<BACKUP_BUCKET>/pravely/*`. There is deliberately no read or delete permission. The backup implementation will use single-request uploads rather than multipart uploads.
+4. If the bucket uses a customer-managed KMS key, add `kms:Encrypt`, `kms:GenerateDataKey`, and `kms:DescribeKey` for that one key. Do not give the daily writer `kms:Decrypt`.
+5. Open the writer's **Security credentials** tab and create one access key for an application running outside AWS. Copy it directly into Supabase in step 9; do not put it in chat, source code, a document, or the browser app.
+6. Create a second user named `pravely-backup-recovery`. Enable console access, use a unique generated password, require a password change, and enroll MFA immediately. Do not create an access key for this identity.
+7. Give recovery only `s3:ListBucket`, `s3:ListBucketVersions`, `s3:GetObject`, and `s3:GetObjectVersion` for the same bucket/prefix. If KMS is used, add `kms:Decrypt` and `kms:DescribeKey` for the one backup key. Do not grant object deletion, bucket administration, IAM administration, or KMS administration.
+8. Store the recovery username, sign-in URL, password, and MFA recovery material in the business password manager and an offline emergency record. Do not use this identity for daily backup runs.
+9. In **Supabase Dashboard → production project → Edge Functions → Secrets**, add `BACKUP_S3_BUCKET`, `BACKUP_AWS_REGION`, `BACKUP_AWS_ACCESS_KEY_ID`, and `BACKUP_AWS_SECRET_ACCESS_KEY`. If applicable, also add `BACKUP_KMS_KEY_ID`. Save them there; never prefix a custom secret with `SUPABASE_`.
+10. Verify only that all required secret *names* appear. Never copy secret values into a test log or support conversation. The backup function can be implemented after the names exist.
+
+Do not add an IP-address condition to these policies. Supabase Edge Functions run on a distributed edge network and do not provide a guaranteed static outbound address. The strong boundary is the one-purpose IAM principal, exact bucket/prefix resources, TLS-only bucket policy, encryption, versioning, and no-delete permissions.
+
+Recommended writer policy (without KMS):
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "ListOnlyTheBackupBucket",
+      "Effect": "Allow",
+      "Action": "s3:ListBucket",
+      "Resource": "arn:aws:s3:::<BACKUP_BUCKET>",
+      "Condition": { "StringLike": { "s3:prefix": ["pravely", "pravely/*"] } }
+    },
+    {
+      "Sid": "UploadWithoutReadOrDelete",
+      "Effect": "Allow",
+      "Action": "s3:PutObject",
+      "Resource": "arn:aws:s3:::<BACKUP_BUCKET>/pravely/*"
+    }
+  ]
+}
+```
+
+Recommended recovery policy (without KMS):
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "ListOnlyTheBackupBucket",
+      "Effect": "Allow",
+      "Action": ["s3:ListBucket", "s3:ListBucketVersions"],
+      "Resource": "arn:aws:s3:::<BACKUP_BUCKET>",
+      "Condition": { "StringLike": { "s3:prefix": ["pravely", "pravely/*"] } }
+    },
+    {
+      "Sid": "ReadVersionsWithoutWriteOrDelete",
+      "Effect": "Allow",
+      "Action": ["s3:GetObject", "s3:GetObjectVersion"],
+      "Resource": "arn:aws:s3:::<BACKUP_BUCKET>/pravely/*"
+    }
+  ]
+}
+```
 
 ## 5. CSP rollout
 

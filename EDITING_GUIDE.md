@@ -88,24 +88,11 @@ Same general steps work for **Cloudflare Pages**.
 
 ---
 
-## How forms work now (Send feedback + Send message)
+## How the support form works
 
-**Both buttons now work out-of-the-box — no Formspree needed.** They open the visitor's own email app with a pre-filled email to `support@pravely.com`.
+The support page uses a Netlify Form named `support-request`, so customers can contact Pravely without opening an email app. Netlify validates and stores the submission. Configure a form notification in the Netlify dashboard so new requests reach the support inbox.
 
-- **Get in touch → Send message:** grabs Name + Email + Message → `mailto:support@pravely.com?subject=Message from [Name]&body=...` — visitor just hits Send in Apple Mail / Gmail.
-- **Feedback → Send feedback:** grabs the pills they checked (Debt payoff, Home affordability…) + "Tell us more" + optional email → `mailto:support@pravely.com?subject=Feedback — [picked]&body=...`
-
-**Why mailto?** It's free, no backend, no spam database, and the email lands in your real inbox. The tradeoff: if the visitor doesn't have a mail app set up (rare on mobile, more common on desktop), it will prompt them to open one.
-
-**Upgrade later (optional, better analytics):** If you want submissions saved automatically without opening email:
-1. Go to **formspree.io** → New Form → copy endpoint `https://formspree.io/f/xxxxx`
-2. In `index.html`, find `<form id="contact-form"` and add `action="https://formspree.io/f/xxxxx" method="POST"` (same for `feedback-form`)
-3. Remove the `window.location.href = mailto...` JS at the bottom (or keep both — mailto will still work as fallback)
-4. Push. Formspree will now email you *and* save in a dashboard.
-
-Your current `EDITING_GUIDE.md` → Forms section still has the 2-minute Formspree steps if you decide to switch.
-
-**To change the destination email:** edit `content.json` → `contactEmail` *and* search `support@pravely.com` in `index.html` (appears in 4 places: contact section + 2 forms + JS).
+**To change the notification destination:** update the `support-request` form notification in Netlify. Also update the fallback address in `contact.html` and `content.json`.
 
 ---
 
@@ -136,11 +123,14 @@ and the tab uses:
 
 ---
 
-## Pricing — 3 products
+## Pricing — current four-offer catalog
 
-- **Pravely Essentials — $19** (was $29): Basic budget sheet only. Starter.
-- **Pravely Complete — $39**: Advanced alone — debt snowball/avalanche, net worth, mortgage, multi-month.
-- **Pravely Premium — $36 founding price** (regularly $49): **Everything in Essentials + Complete, plus Premium planning tools**. Marked FOUNDING CUSTOMER OFFER. The founding-price explanation appears directly beneath the pricing cards.
+- **Pravely Essentials — Included:** free with a Pravely account during the launch offer.
+- **Pravely Plus — $89:** one-time app purchase.
+- **Pravely Complete — $159:** one-time app purchase.
+- **Plus to Complete upgrade — $70:** one-time upgrade for existing Plus customers.
+
+Legacy paid workbook products are not part of the current direct-sales catalog.
 
 Edit prices/links in `content.json` → `pricing` and `stripeLinks`.
 

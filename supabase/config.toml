@@ -52,6 +52,11 @@ verify_jwt = false
 [functions.submit-support]
 verify_jwt = false
 
+[functions.independent-storage-backup]
+# Scheduled calls authenticate with a random token generated inside Postgres
+# and stored in Vault; the function verifies its hash before doing any work.
+verify_jwt = false
+
 [functions.claim-essentials]
 verify_jwt = true
 

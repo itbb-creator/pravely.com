@@ -90,6 +90,15 @@ These steps assume the independent destination is AWS S3. Replace every value in
 
 Do not add an IP-address condition to these policies. Supabase Edge Functions run on a distributed edge network and do not provide a guaranteed static outbound address. The strong boundary is the one-purpose IAM principal, exact bucket/prefix resources, TLS-only bucket policy, encryption, versioning, and no-delete permissions.
 
+Production implementation status (verified September 14, 2026):
+
+- `independent-storage-backup` is deployed with a private, randomly generated database-to-function trigger token stored in Supabase Vault. The token value is not stored in source control or exposed to browser clients.
+- The job copies the three private Storage buckets into a new timestamped `pravely/` prefix, requests an S3 SHA-256 checksum for every upload, and writes a final manifest containing source size/hash and destination version metadata.
+- The first production run succeeded: 13 objects and 1,782,673 bytes were copied using SSE-KMS, and the manifest was stored with its SHA-256 recorded in `backup_runs`.
+- The production schedule is active at 05:15 UTC every day. Each run creates a new prefix; the writer has no delete or read permission.
+- Failure notifications go to `SUPPORT_EMAIL` through the production Resend configuration and contain no customer content or object paths.
+- The remaining human control is the quarterly restore drill using the MFA-protected recovery identity. Record the restored sample, calculated hash, manifest comparison, reviewer, date, and removal of the isolated test copy.
+
 Recommended writer policy (without KMS):
 
 ```json

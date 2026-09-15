@@ -1,5 +1,7 @@
 # Workbook release and update-email process
 
+> **Companion workbook delivery only.** This process does not release the responsive web app and must not be used as the web-v1 deployment checklist.
+
 ## One-time Resend setup
 
 1. Create a Resend account and add a sending subdomain such as

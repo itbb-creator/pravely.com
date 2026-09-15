@@ -9,9 +9,11 @@
     "seed": "node scripts/seed-masters.mjs",
     "simulate": "node --experimental-strip-types scripts/simulate-purchase.mjs",
     "email-release": "node --experimental-strip-types scripts/send-release-update.mjs",
-    "test": "node --experimental-strip-types scripts/test-personalize.mjs"
+    "test": "node --experimental-strip-types scripts/test-personalize.mjs",
+    "test:health-coach": "node --experimental-strip-types scripts/test-health-coach.mjs",
+    "test:release-hardening": "node scripts/test-release-hardening.mjs"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   }
 }

@@ -1,5 +1,7 @@
 # Pravely Product and Security Audit
 
+> **Historical audit snapshot.** Findings are evidence from September 8, not current certification; use the current master plan and rerun applicable checks before launch.
+
 Date: September 8, 2026  
 Scope: live `app.pravely.com` experience, account/recovery pages on `pravely.com`, this repository's Supabase migrations and Edge Functions, public HTTP headers, and anonymous-access probes. No production data was changed.
 

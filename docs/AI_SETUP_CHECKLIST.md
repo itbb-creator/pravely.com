@@ -46,8 +46,42 @@ Nothing was deleted. Specifically:
 - Codex's `codex/*` branches were not touched.
 
 **The one thing this does not protect:** anything sitting uncommitted on
-your own computer. If you have local edits in either project, commit and
-push them to `preview` before you go further.
+your own computer.
+
+### How to check whether you have local work
+
+If you never edit these projects on your own machine, skip this. You have
+nothing to push.
+
+Otherwise, open a terminal in each project folder and run:
+
+```
+git status
+git log --oneline origin/main..HEAD
+```
+
+- `git status` says **nothing to commit, working tree clean** and the second
+  command prints nothing → you are fully backed up, nothing to do.
+- `git status` lists files → you have edits that exist only on your machine.
+- The second command prints commits → you have commits that were never pushed.
+
+### How to push it, if you do have local work
+
+`preview` now requires a pull request, so you cannot push straight to it.
+Put the work on its own branch instead:
+
+```
+git fetch origin
+git checkout -b my-local-work
+git add -A
+git commit -m "Local work in progress"
+git push -u origin my-local-work
+```
+
+Then open https://github.com/itbb-creator/Pravely/pulls, click **New pull
+request**, set the base to `preview` and the compare branch to
+`my-local-work`, and create it. Ask Claude to review and merge it, or merge
+it yourself.
 
 ---
 
@@ -158,59 +192,85 @@ One minute, and worth doing even after Step 2.
 Netlify keeps building `main` so you can see whether it works, but nothing
 reaches the live URL until you open a build and click **Publish deploy**.
 
-If you skipped Step 2 because of the GitHub Pro cost, this is the step
-carrying your safety.
+**Steps 2 and 5 are not alternatives. Do both.** Step 2 stops a bad change
+reaching `main`. Step 5 stops anything on `main` reaching the public without
+a deliberate click. They guard different moments, and neither undoes the
+other. The earlier wording only meant that Step 5 becomes essential if
+GitHub's pricing blocked Step 2.
+
+One thing to expect day to day: with auto publishing off, merging into
+`main` no longer changes the live site by itself. Netlify builds it and
+stops. Go to **Deploys**, open the newest `main` build, and click **Publish
+deploy** to make it live. If a change looks like it did not deploy, that is
+almost always the reason.
 
 ---
 
-## Step 6. Check what the live site is using
+## Step 6. Captcha keys: no Netlify variable needed
 
-Ten minutes. Do this once, now.
+**Nothing to do here.** Corrected September 15, 2026 after reading the
+actual source.
 
-The preview work used Cloudflare's always-pass captcha test key. If that
-value ever got set as a plain site-wide variable instead of a
-preview-only one, the live signup form passes every bot.
+An earlier version of this checklist assumed the Turnstile key came from a
+Netlify environment variable. It does not. `client/src/components/Turnstile.tsx`
+picks the key in this order:
 
-1. Netlify → **pravelyapp** → **Site configuration** → **Environment
-   variables**
-2. Look for a variable whose name contains `TURNSTILE`. The app uses names
-   starting with `VITE_`
-3. Check its **Scopes** column
-   - Says **All deploy contexts** → this is the problem case, go to Step 7
-   - Lists Production and Deploy previews separately → you are fine
-4. Check the production value. If it is `1x00000000000000000000AA`, that is
-   Cloudflare's always-pass test key and your live captcha is not protecting
-   anything
+1. `VITE_TURNSTILE_SITE_KEY`, if it is set
+2. Cloudflare's test key, but only when the hostname is `localhost` or `127.0.0.1`
+3. Otherwise the real production site key, hardcoded as a fallback
 
-Also check any `VITE_SUPABASE_URL` variable the same way. The production
-project reference is `vtrdkoeydzvrhtiuykja`.
+So an empty Environment variables page is the correct and safe state. The
+fallback is deliberate, so that a missing hosting variable cannot silently
+turn the captcha off. Production is using the real key.
 
-**One trap to know about.** If `VITE_SUPABASE_URL` is not set at all, the
-app silently falls back to the production database, because that fallback is
-hardcoded in `client/src/lib/supabase.ts`. A preview build with no variables
-set is talking to real customer data.
+The same is true of Supabase. `client/src/lib/supabase.ts` falls back to the
+production project `vtrdkoeydzvrhtiuykja` when `VITE_SUPABASE_URL` is unset.
 
 ---
 
-## Step 7. Separate preview values from production values
+## Step 7. Know what your preview URLs are talking to
 
-Only needed if Step 6 found shared values. Ten minutes.
+**Read this one, even though there is nothing to click.**
 
-1. Netlify → **pravelyapp** → **Site configuration** → **Environment
-   variables**
-2. Click a variable → **Options** → **Edit**
-3. Change it from one shared value to **Different value for each deploy
-   context**
-4. Fill in:
+The Supabase `security-preview` branch no longer exists. The project has
+only `main`. Two consequences follow from that plus the fallbacks above.
 
-   | Variable | Production | Deploy previews and branch deploys |
-   | --- | --- | --- |
-   | Turnstile site key | real widget key | `1x00000000000000000000AA` |
-   | Supabase URL | production project | `security-preview` branch project |
-   | Supabase publishable key | production | preview branch |
-   | Stripe publishable key | live key | test key |
+**Deploy previews use the production database.** A preview build with no
+environment variables falls back to production. So when you test signup on
+a preview URL, you are creating a real user in your real database. Use
+plus-addressed throwaway addresses such as `you+test1@gmail.com` and delete
+the accounts afterwards. Do not test deletion, billing, or admin flows
+against a preview until this is separated.
 
-5. **Save**, then redeploy
+**Deploy previews use the real captcha key.** Cloudflare matches a widget
+hostname exactly, or as a subdomain of a listed domain.
+`deploy-preview-12--pravelyapp.netlify.app` is not a subdomain of
+`pravelyapp.netlify.app`, because the two dashes are part of the same label.
+So the widget may refuse to render on per-pull-request preview URLs.
+
+The practical workaround: test on the **branch deploy** rather than the
+per-pull-request preview. `preview--pravelyapp.netlify.app` is one stable
+hostname you can add to the Cloudflare widget once. Add it, then load the
+page and confirm the widget appears. If it shows an error instead, the
+hostname is not matching and needs adding exactly as it appears in the
+address bar.
+
+**The real fix, when you have time.** Create a new persistent Supabase
+branch for preview, then set four variables in Netlify scoped to Deploy
+previews and Branch deploys only:
+
+| Variable | Deploy previews and branch deploys |
+| --- | --- |
+| `VITE_TURNSTILE_SITE_KEY` | `1x00000000000000000000AA` |
+| `VITE_SUPABASE_URL` | the new preview branch URL |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | the new preview branch key |
+| Stripe publishable key | test key |
+
+Leave production unset so it keeps using the built-in real values. The site
+key and the Supabase project must always come from the same environment,
+because Supabase verifies the captcha token with the secret held by whichever
+project the app is pointed at. A test site key against production Supabase
+will always fail.
 
 ---
 

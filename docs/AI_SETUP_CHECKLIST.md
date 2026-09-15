@@ -26,7 +26,28 @@ Done for you, no action needed:
 
 - [x] `preview` branch created in `Pravely`
 - [x] `preview` branch created in `pravely.com`
-- [x] `CLAUDE.md` rules file added to both, on `preview`
+- [x] `AGENTS.md` and `CLAUDE.md` rules added to both, on `preview`
+- [x] Nine unmerged August branches preserved as `archive/*` branches
+- [x] Stale pull requests #6, #7 and #8 closed
+- [x] Security audit and preview status moved to the private app repo
+
+## Your existing work is safe
+
+Nothing was deleted. Specifically:
+
+- `preview` in both repos was cut from the current `main`, so it contains
+  everything you have.
+- Nine branches held commits that were never merged into `main`. Each now
+  has a permanent copy under `archive/`, so the work cannot be lost even
+  after you delete the originals.
+- Closing a pull request deletes nothing. All three can be reopened.
+- The two security documents were copied into the private repo before being
+  removed from the public one.
+- Codex's `codex/*` branches were not touched.
+
+**The one thing this does not protect:** anything sitting uncommitted on
+your own computer. If you have local edits in either project, commit and
+push them to `preview` before you go further.
 
 ---
 
@@ -220,23 +241,35 @@ Squarespace holding your DNS does not affect this.
 
 ## Step 9. Housekeeping
 
-Small things, no rush.
+Small things, no rush. These need you because they cannot be done through
+the API this session has.
 
-- Archive the duplicate app repo. `Pravely-App` has been idle since August
-  and having two similarly named app repos is how a change ends up in the
-  wrong one.
-  https://github.com/itbb-creator/Pravely-App/settings → bottom → **Archive
-  this repository**
-- Delete the fifteen dead branches in the marketing repo, and close pull
-  requests #6, #7, and #8 from August.
-- Decide about the public security documents. `pravely.com` is a public
-  repo, so `docs/PRODUCT_SECURITY_AUDIT_2026-09-08.md` and
-  `docs/PREVIEW_RELEASE_STATUS_2026-09-09.md` are readable by anyone, and
-  they list which protections are not yet enabled. No passwords are exposed.
-  Either move them into the private app repo, or make this repo private at
-  Settings → Danger Zone → **Change repository visibility**.
-- Turn on leaked-password protection in Supabase. Still open from
-  September 9.
+**Delete the thirteen dead branches.** Go to
+https://github.com/itbb-creator/pravely.com/branches → **All branches**,
+and click the trash icon on each of these:
+
+```
+agent/automate-validation              arena/019fedf2-intheblackbudget-com
+agent/remove-apple-numbers             arena/019fee04-intheblackbudget-com
+agent/site-launch-updates              arena/019feec2-intheblackbudget-com
+agent/update-site-copy-and-platforms   arena/019ff95b-intheblackbudget-com
+arena/019fe8df-intheblackbudget-com    arena/019ffe6a-intheblackbudget-com
+arena/019fede1-intheblackbudget-com    arena/01a002c0-intheblackbudget-com
+                                       arena/01a006d4-intheblackbudget-com
+```
+
+Their content is already preserved under `archive/`. Do not delete anything
+starting with `archive/`, `codex/`, `claude/`, `preview`, or `main`.
+
+**Archive the duplicate app repo.** `Pravely-App` has been idle since
+August, and two similarly named app repos is how a change ends up in the
+wrong one.
+https://github.com/itbb-creator/Pravely-App/settings → bottom → **Archive
+this repository**
+
+**Turn on leaked-password protection in Supabase.** Still open from
+September 9. Dashboard → **Authentication** → **Sign In / Providers** →
+**Email** → enable **Leaked password protection**.
 
 ---
 
@@ -253,6 +286,35 @@ Small things, no rush.
 
 Steps 5 and 7 are the whole difference. Automatic where being wrong is
 cheap, manual where it is not.
+
+---
+
+## Working with Codex and Claude at the same time
+
+Both now read `AGENTS.md`, which sits at the root of each repo and holds
+one shared rule set. `CLAUDE.md` just points at it, so the rules cannot
+drift apart.
+
+What keeps them out of each other's way:
+
+- **Separate branch names.** Codex uses `codex/...`, Claude uses
+  `claude/...`. Neither may touch the other's branches.
+- **Both merge into `preview`, never `main`.** That branch is the single
+  place their work meets.
+- **Both check open pull requests before starting.** If one is already
+  editing a file, the other is told to stop and say so rather than open a
+  competing change.
+- **Neither may force-push.** That is the operation that destroys the
+  other's work, so it is off limits for both.
+
+What you should do:
+
+- Give them different areas when you can. One on captcha, the other on
+  billing, rather than both in the auth flow.
+- Merge finished work into `preview` promptly. An open pull request left
+  for days means the other assistant is building on stale code.
+- If they do collide, the fix is always to merge `preview` into the stuck
+  branch and resolve it there. Never force-push out of a conflict.
 
 ---
 

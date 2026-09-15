@@ -1,0 +1,112 @@
+name: Guard destructive migrations
+
+# Fails any pull request whose new migration SQL would destroy existing
+# customer data, unless a human has deliberately labelled it as approved.
+#
+# Background: 20260831032633_add_financial_client_keys.sql contains
+# "alter table public.budget_entries drop column goal_id", which permanently
+# destroyed that column's values. It was harmless pre-launch. After launch
+# the same statement is unrecoverable without a backup restore. This check
+# turns that from a silent accident into a deliberate decision.
+#
+# To ship a genuinely intended destructive migration, add the label
+# "destructive-migration-approved" to the pull request and re-run this check.
+
+on:
+  pull_request:
+    paths:
+      - 'supabase/migrations/**'
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    name: Scan added migration SQL
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Look for destructive statements
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
+          OVERRIDE_LABEL: destructive-migration-approved
+        run: |
+          set -euo pipefail
+
+          # Added lines only. A migration that is deleted or moved cannot
+          # destroy anything; only newly introduced SQL can.
+          added="$(git diff "$BASE_SHA...$HEAD_SHA" -- 'supabase/migrations/**' \
+            | grep '^+' | grep -v '^+++' | sed 's/^+//' || true)"
+
+          if [ -z "$added" ]; then
+            echo "No migration lines were added. Nothing to scan."
+            exit 0
+          fi
+
+          # Strip -- line comments before matching. One existing migration
+          # mentions TRUNCATE in a comment, and a comment cannot delete data.
+          cleaned="$(printf '%s\n' "$added" | sed 's/--.*$//')"
+
+          pattern='drop[[:space:]]+(table|column|schema|database)'
+          pattern="$pattern|truncate[[:space:]]"
+          pattern="$pattern|delete[[:space:]]+from"
+          pattern="$pattern|alter[[:space:]]+column[[:space:]]+[a-zA-Z0-9_\"]+[[:space:]]+type"
+
+          hits="$(printf '%s\n' "$cleaned" | grep -inE "$pattern" || true)"
+
+          if [ -z "$hits" ]; then
+            echo "No destructive statements found in the added migration SQL."
+            exit 0
+          fi
+
+          echo "Destructive SQL found in this pull request:"
+          echo
+          printf '%s\n' "$hits"
+          echo
+
+          case ",$PR_LABELS," in
+            *",$OVERRIDE_LABEL,"*)
+              echo "Label '$OVERRIDE_LABEL' is present. Allowing the merge."
+              echo "Take a manual database backup before this reaches production."
+              exit 0
+              ;;
+          esac
+
+          cat <<'GUIDANCE'
+          This check failed on purpose.
+
+          The statements above destroy data that already exists in the
+          database. Once applied to production they cannot be undone except
+          by restoring a backup, and Storage objects are not covered by
+          database backups at all.
+
+          Prefer expand and contract:
+
+            1. Add the new column or table.
+            2. Backfill it from the old one.
+            3. Ship the code that reads the new one.
+            4. Let it run in production for at least one release.
+            5. Drop the old column in a LATER pull request.
+
+          Other common fixes:
+
+            - Renaming a column? Add the new one and backfill instead.
+            - Changing a type? Add a new column with the new type, backfill,
+              then switch reads.
+            - Adding NOT NULL? Give it a DEFAULT, or add it nullable,
+              backfill, then SET NOT NULL. Adding NOT NULL with no default
+              to a table that already has rows aborts the migration.
+
+          If the deletion really is intended, add the label
+          'destructive-migration-approved' to this pull request, take a
+          manual database backup, and record the backup id in the release
+          notes.
+          GUIDANCE
+
+          exit 1

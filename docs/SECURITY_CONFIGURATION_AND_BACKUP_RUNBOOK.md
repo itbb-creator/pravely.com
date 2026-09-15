@@ -147,16 +147,22 @@ Recommended recovery policy (without KMS):
 
 ## 5. CSP rollout
 
-The app and marketing site now send the other defense-in-depth headers. CSP is intentionally **Report-Only** while remaining inline styles/scripts and third-party calls are inventoried.
+Production status (September 15, 2026):
+
+- The app sends an enforced `Content-Security-Policy` with production-only Supabase and Turnstile origins, together with HSTS, frame denial, MIME sniffing protection, a strict referrer policy, and a minimal permissions policy.
+- The marketing site configuration also sends an enforced CSP. Its legacy static pages still require `unsafe-inline` for existing inline styles and scripts, so replacing those blocks with static assets or hashes remains a defense-in-depth improvement.
+- Netlify must be serving the sites before the live headers and all customer flows can be re-verified after each policy change.
+
+For future CSP changes:
 
 1. Exercise every page and authentication/payment/download flow in preview.
 2. Collect CSP violations in a privacy-safe reporting endpoint. Do not log full financial URLs or query values.
 3. Move remaining inline scripts/styles to static assets or use per-response nonces/hashes.
 4. Reduce host wildcards to exact required origins.
-5. Run at least one clean observation period, then change `Content-Security-Policy-Report-Only` to enforced `Content-Security-Policy`.
-6. Retain reporting briefly after enforcement so regressions are visible.
+5. Run at least one clean observation period before tightening an enforced policy.
+6. Retain privacy-safe reporting after enforcement so regressions are visible.
 
-Do not switch directly to enforcement before checkout, CAPTCHA, Supabase, fonts, workbook delivery, and mobile packaging have been verified.
+Do not further tighten enforcement before checkout, CAPTCHA, Supabase, fonts, workbook delivery, and mobile packaging have been verified.
 
 ## 6. AI processing controls
 

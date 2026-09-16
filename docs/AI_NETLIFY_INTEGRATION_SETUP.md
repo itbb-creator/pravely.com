@@ -524,6 +524,9 @@ Still outstanding from your September 9 status document.
    Cloudflare matches subdomains of a listed hostname, so
    `pravelyapp.netlify.app` covers `deploy-preview-1--pravelyapp.netlify.app`.
    Confirm this on the widget's settings page rather than assuming it.
+
+   The same rule means `books.pravely.com` needs no entry of its own; the
+   `pravely.com` line covers it. See 14.3.
 6. **Widget mode:** **Managed**
 7. Click **Create**.
 8. Copy the **Site Key** into Netlify production scope per Part 8.
@@ -673,6 +676,104 @@ was pushed, regardless of how quickly it was removed.
 
 ---
 
+## Part 14 — Pravely Books (`books.pravely.com`)
+
+Pravely Books is the internal bookkeeping tool. It is a second, separate build
+of the `Pravely` repo, not a third repo and not part of the customer app. It
+went live on 16 September 2026.
+
+### 14.1 Why it exists
+
+The `business_*` tables were always admin-only and always required AAL2, so the
+accounting module was never a customer feature. It was still **compiled into the
+customer bundle**: the app imported it statically and only hid the rendering
+behind an admin check, so the internal tooling was readable in devtools by
+anyone. Splitting it into its own build removes it from the customer bundle
+entirely.
+
+### 14.2 Netlify site configuration
+
+A separate Netlify site, publishing a different output directory from the same
+repository:
+
+| Setting | Value |
+| --- | --- |
+| Branch to deploy | `preview` (see 14.4 before changing this) |
+| Build command | `npm run build:books` |
+| Publish directory | `dist-books` |
+| Custom domain | `books.pravely.com` |
+
+`npm run build` and `npm run build:books` write to `dist/` and `dist-books/`
+respectively and never collide, so the app site and the books site can build
+from the same commit without interfering.
+
+No Netlify environment variables are required on the books site. The Supabase
+URL, the Supabase publishable key, and the Turnstile site key all have
+production fallbacks compiled into the client, so an unset variable yields the
+production value rather than an empty one. That is deliberate: it is the same
+"missing key disables the captcha silently" failure described in 8.2, and the
+fallback is what prevents it.
+
+### 14.3 Turnstile needs no new hostname
+
+`books.pravely.com` does **not** need its own entry in the Part 9 hostname
+allowlist. Cloudflare Turnstile matches subdomains of a listed hostname, and
+`pravely.com` is already listed, so the subdomain was covered the moment DNS
+resolved.
+
+This was verified by signing in, not by reading configuration. The sign-in form
+refuses to submit without a captcha token, so a hostname Cloudflare rejected
+would have blocked the attempt. A successful sign-in is therefore proof that the
+widget rendered, Cloudflare issued a token for this hostname, and Supabase
+accepted it.
+
+Squarespace holding the DNS has no bearing on this. Turnstile only checks the
+hostname.
+
+### 14.4 Which branch the books site should deploy
+
+It deploys `preview` today, which means the tool used for real bookkeeping
+tracks the integration branch and changes on every merge, with no release step.
+`main` would be the better source.
+
+**It cannot move yet.** As of 16 September 2026 `main` contains no `books/`
+directory, no `vite.books.config.ts`, no `script/build-books.ts`, and no
+`build:books` script. Pointing the books site at `main` today fails the build
+immediately.
+
+Moving it is blocked behind a larger problem: **`main` and `preview` have
+diverged.** They share no history after the 10 September merge of pull request
+#1. `main` has since taken direct pushes carrying product and security work —
+security headers, the post-sign-in MFA challenge, trial and paid plan
+separation, the web v1 gates and acceptance suite — none of which is on
+`preview`. `preview` carries the Books split and the officer skills, none of
+which is on `main`. Their `package.json` files differ in both directions:
+`main` pins `engines.node >= 22` and has three test scripts `preview` lacks;
+`preview` has `build:books`, which `main` lacks.
+
+So `preview` → `main` is not a fast-forward and is not a routine merge. In
+particular `main`'s 16 September commit "Clarify internal accounting and add
+release checks" touches the same area as the Books split and should be expected
+to conflict.
+
+The order that keeps production safe:
+
+1. Merge `main` **into** `preview` first and resolve the conflicts there, where
+   a broken result costs nothing. Do not resolve conflicts on `main`.
+2. Confirm on `preview` that `npm run build`, `npm run build:books`, and
+   `npm run check` all pass, and that the customer bundle still contains no
+   `business_*` reference.
+3. Only then open `preview` → `main`, which by the rules in Part 10 is the
+   owner's merge to make.
+4. After that lands, change the books site's branch to `main` and redeploy.
+5. Sign in at `books.pravely.com` and confirm the captcha widget renders and the
+   ledger loads before considering the move done.
+
+Until step 4, production still ships the accounting module inside the customer
+app. The split exists only on `preview`.
+
+---
+
 ## Setup checklist
 
 Part 0, urgent:
@@ -712,3 +813,12 @@ Then:
 
 - [ ] Add `CLAUDE.md` to both repos
 - [ ] Optionally connect the Netlify MCP server from the local CLI
+
+Pravely Books, see Part 14:
+
+- [x] Books site building `npm run build:books` into `dist-books`
+- [x] `books.pravely.com` resolving, sign-in and ledger confirmed working
+- [x] Turnstile hostname confirmed covered by the `pravely.com` entry
+- [ ] Reconcile the diverged `main` and `preview`, starting with `main` → `preview`
+- [ ] Merge `preview` → `main` so production stops shipping accounting to customers
+- [ ] Repoint the books site from `preview` to `main`

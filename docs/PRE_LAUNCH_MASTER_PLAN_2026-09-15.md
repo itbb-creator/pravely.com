@@ -65,7 +65,7 @@ Nothing else should be called launch-ready until this gate is complete.
 - The personal-plan report labels the customer “Beta member.” Apple explicitly rejects beta versions from normal App Store distribution.
 - The Settings page exposes disabled “Buy us a coffee” controls when payment links are absent.
 - Internal accounting is restricted to admin-designated accounts and excluded from customer claims; it is explicitly labeled as not being Pravely’s approved accounting system of record.
-- AI Health Coach has a deterministic preview fallback; the last positive hosted check was blocked by exhausted OpenAI credit.
+- AI Health Coach has a deterministic fallback. A funded production response, the production kill switch, and recovery after re-enabling passed on September 16, 2026.
 - Older operating documents still refer to a $36 Premium workbook offer and workbook-first launch even though the current website sells the app at $89 Plus / $159 Complete with a $70 upgrade.
 
 The first seven customer-facing contradictions above were corrected locally for preview. Historical workbook-first documentation remains inventoried, not yet archived; see `docs/WORKBOOK_REFERENCE_INVENTORY_2026-09-15.md`.
@@ -124,7 +124,7 @@ The first seven customer-facing contradictions above were corrected locally for 
 
 ### 5. AI feature decision
 
-- [ ] Retain and positively test the funded AI Health Coach. Local validation, hosted entitlement denial, provider-outage handling, alert reservation, and kill-switch tests pass; one successful funded preview response remains.
+- [x] Retain and positively test the funded AI Health Coach. Local validation, hosted entitlement denial, preview provider-outage handling and alert reservation, a funded production response, the production kill switch, and recovery after re-enabling all pass.
 - [ ] If retained, set a hard monthly spend cap, per-user/request limits, timeout, retry policy, and a user-friendly unavailable state.
 - [ ] Test prompt-injection-like user input, extremely long input, malformed responses, provider refusal, rate limiting, network failure, and exhausted credit.
 - [ ] Confirm responses never change deterministic calculations or execute financial actions.

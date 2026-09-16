@@ -75,3 +75,21 @@ captcha change, confirm in a browser that the widget actually renders.
 
 Note that `netlify.toml` redirects `/account.html` to app.pravely.com, so
 this page is not the signup form real users reach.
+
+## Finish the work before handing it back
+
+The owner's standing instruction, given 16 September 2026: complete
+everything that can be completed without them, then end with a short list of
+what is left for them to do.
+
+- Do not stop mid-task to ask permission for a step these rules already
+  allow. Merging a green pull request into `preview` is allowed, so do it
+  rather than asking.
+- Do not lay out options and wait. Choose the sound one, carry it out, and
+  say what was chosen and why.
+- When something genuinely needs the owner — the `preview` to `main` merge,
+  a Netlify or Cloudflare dashboard change, anything under "Never do these
+  without the owner saying so" — do all the work up to that boundary, then
+  give the exact steps they need to take.
+- Ask first only when either choice would be unsafe, or when guessing wrong
+  would waste the work.

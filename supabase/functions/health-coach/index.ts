@@ -61,7 +61,10 @@ Deno.serve(async (req: Request) => {
       return jsonResponse({ error: 'The coaching request is too large.' }, 413, req);
     }
     const input = cleanHealthRequest(await readJson<HealthRequest>(req));
-    const apiKey = envGet('OPENAI_API_KEY');
+    const keyEnvironment = envGet('OPENAI_KEY_ENV', 'production').toLowerCase();
+    const apiKey = keyEnvironment === 'preview'
+      ? envGet('OPENAI_API_KEY_PREVIEW') || envGet('OPENAI_API_KEY')
+      : envGet('OPENAI_API_KEY_PRODUCTION') || envGet('OPENAI_API_KEY');
     if (!apiKey) {
       await notifyFounder(sb, 'configuration_failure', 'The Health Coach is missing its OpenAI API key.');
       return jsonResponse({ error: 'AI coaching is not configured yet.' }, 503, req);

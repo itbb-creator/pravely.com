@@ -51,6 +51,9 @@ assert.match(aiFunction, /contentLength > 20_000/);
 assert.match(aiFunction, /total_tokens/);
 assert.match(aiFunction, /notifyFounder/);
 assert.match(aiFunction, /AI_ALERT_EMAIL/);
+assert.match(aiFunction, /OPENAI_KEY_ENV/);
+assert.match(aiFunction, /OPENAI_API_KEY_PREVIEW/);
+assert.match(aiFunction, /OPENAI_API_KEY_PRODUCTION/);
 assert.doesNotMatch(aiFunction, /console\.(?:log|info|error)\([^\n]*(?:prompt|financial|input)/i);
 
 const marketing = await readFile(new URL('../index.html', import.meta.url), 'utf8');

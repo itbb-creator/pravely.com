@@ -742,34 +742,64 @@ directory, no `vite.books.config.ts`, no `script/build-books.ts`, and no
 immediately.
 
 Moving it is blocked behind a larger problem: **`main` and `preview` have
-diverged.** They share no history after the 10 September merge of pull request
-#1. `main` has since taken direct pushes carrying product and security work —
-security headers, the post-sign-in MFA challenge, trial and paid plan
-separation, the web v1 gates and acceptance suite — none of which is on
-`preview`. `preview` carries the Books split and the officer skills, none of
-which is on `main`. Their `package.json` files differ in both directions:
-`main` pins `engines.node >= 22` and has three test scripts `preview` lacks;
-`preview` has `build:books`, which `main` lacks.
+diverged.** Their merge base is `96bbd51` "Keep MFA authenticator-only", from
+15 September. Since then `main` has taken three direct pushes that never went
+through `preview`:
 
-So `preview` → `main` is not a fast-forward and is not a routine merge. In
-particular `main`'s 16 September commit "Clarify internal accounting and add
-release checks" touches the same area as the Books split and should be expected
-to conflict.
+| Commit | Subject |
+| --- | --- |
+| `4a62e47` | Complete web v1 product gates |
+| `09a8a23` | Add hosted web v1 acceptance suite |
+| `404a013` | Clarify internal accounting and add release checks |
 
-The order that keeps production safe:
+`preview` is fifteen commits ahead on its own line, carrying the Books split and
+the officer skills.
 
-1. Merge `main` **into** `preview` first and resolve the conflicts there, where
-   a broken result costs nothing. Do not resolve conflicts on `main`.
-2. Confirm on `preview` that `npm run build`, `npm run build:books`, and
-   `npm run check` all pass, and that the customer bundle still contains no
-   `business_*` reference.
-3. Only then open `preview` → `main`, which by the rules in Part 10 is the
+### 14.5 The merge is clean, and that is the danger
+
+`git merge origin/main` into `preview` reports **zero conflicts**. Do not read
+that as "safe to merge". The clean merge **silently undoes the Books split**.
+
+`4a62e47` rewrote 307 lines of `client/src/App.tsx`, including the regions the
+split had deleted. Git saw no conflict, took `main`'s version of those regions,
+and reinstated all four pieces of the accounting module in the customer app:
+
+- the `import AccountingPage from "./Accounting"` statement
+- the `"accounting"` member of the `View` type
+- the sidebar nav item, now relabelled "Pravely accounting" by `404a013`
+- the `{active === "accounting" && user.isAdmin && <AccountingPage />}` block
+
+That is exactly the static import the split existed to remove, so the merged
+customer bundle contains the internal tooling again. This is the failure mode
+where git is working correctly and the result is still wrong: a deletion on one
+side and a wholesale rewrite on the other resolve in the rewriter's favour
+without a conflict marker to warn anyone.
+
+So the merge needs a deliberate step after it, not just a conflict check.
+
+`main` also adds `.github/workflows/verify.yml`, which runs on every pull
+request: a tracked-file secret scan, `npm run check`, four test scripts,
+`npm run build`, and `npm audit`. It does **not** run `npm run build:books`, so
+the Books build stays uncovered by CI until that line is added.
+
+### 14.6 The order that keeps production safe
+
+1. Merge `main` **into** `preview` first, on a branch. A broken result costs
+   nothing there. Never resolve any of this on `main`.
+2. **Re-remove the four accounting pieces from `client/src/App.tsx`** listed in
+   14.5. The merge will have put them back without saying so.
+3. Verify, and do not skip the last one: `npm run check`, `npm run build`,
+   `npm run build:books`, and confirm the built customer bundle contains no
+   `business_*` reference. Grep the build output, not the source.
+4. Consider adding `npm run build:books` to `verify.yml` so this cannot regress
+   unnoticed again.
+5. Only then open `preview` → `main`, which by the rules in Part 10 is the
    owner's merge to make.
-4. After that lands, change the books site's branch to `main` and redeploy.
-5. Sign in at `books.pravely.com` and confirm the captcha widget renders and the
+6. After that lands, change the books site's branch to `main` and redeploy.
+7. Sign in at `books.pravely.com` and confirm the captcha widget renders and the
    ledger loads before considering the move done.
 
-Until step 4, production still ships the accounting module inside the customer
+Until step 5, production still ships the accounting module inside the customer
 app. The split exists only on `preview`.
 
 ---
@@ -819,6 +849,6 @@ Pravely Books, see Part 14:
 - [x] Books site building `npm run build:books` into `dist-books`
 - [x] `books.pravely.com` resolving, sign-in and ledger confirmed working
 - [x] Turnstile hostname confirmed covered by the `pravely.com` entry
-- [ ] Reconcile the diverged `main` and `preview`, starting with `main` → `preview`
+- [ ] Merge `main` → `preview`, then re-remove the accounting pieces the clean merge restores
 - [ ] Merge `preview` → `main` so production stops shipping accounting to customers
 - [ ] Repoint the books site from `preview` to `main`

@@ -74,15 +74,15 @@ The first seven customer-facing contradictions above were corrected locally for 
 
 ### 1. Core calculation correctness
 
-- [ ] Write a calculation specification for every customer-visible number: income, spending, safe-to-use amount, surplus, health score, debt totals, payoff date, interest saved, goal date, net worth, projections, tax reserve, and report totals.
-- [ ] Give each formula a fixed example that can be independently calculated outside the app.
-- [ ] Add automated tests for zero values, decimals, negative cash flow, overpayments, missing categories, very large values, dates at month/year boundaries, leap years, different time zones, and partially completed data.
+- [x] Write a calculation specification for every customer-visible number: income, spending, safe-to-use amount, surplus, health score, debt totals, payoff date, interest saved, goal date, net worth, projections, tax reserve, and report totals. (`docs/CUSTOMER_CALCULATION_SPECIFICATION.md` in the private app repository.)
+- [x] Give each formula a fixed example that can be independently calculated outside the app.
+- [x] Add automated tests for zero values, decimals, negative cash flow, overpayments, missing categories, very large values, dates at month/year boundaries, leap years, different time zones, and partially completed data.
 - [ ] Verify rounding and currency formatting are consistent between screen, CSV, spreadsheet, and PDF output.
 - [ ] Verify editing or deleting a source entry updates every dashboard, score, chart, forecast, and report that depends on it.
-- [ ] Verify month rollover, back-dated entries, future entries, and the chosen reporting period do not move transactions into the wrong month.
+- [x] Verify month rollover, back-dated entries, future entries, and the chosen reporting period do not move transactions into the wrong month.
 - [ ] Define and test behavior for duplicated records and rapid double-submission.
 - [x] Exclude Pravely accounting from the customer product and public feature matrix; keep the internal utility hidden from non-admin customers and deny customer API access.
-- [ ] Have a qualified accountant review only the accounting feature's calculations and outputs before the product represents them as company books or tax preparation.
+- [x] Remove the separate Pravely Books/accounting product from this customer-app launch gate. Its accounting review remains a requirement in that separate project's own release process.
 
 ### 2. Saving, sync, and data durability
 

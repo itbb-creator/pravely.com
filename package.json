@@ -13,6 +13,7 @@
     "email-release": "node --experimental-strip-types scripts/send-release-update.mjs",
     "test": "node --experimental-strip-types scripts/test-personalize.mjs",
     "test:health-coach": "node --experimental-strip-types scripts/test-health-coach.mjs",
+    "test:repository-core": "node --experimental-strip-types scripts/test-repository-core.mjs",
     "test:release-hardening": "node scripts/test-release-hardening.mjs && node scripts/build-feature-page.mjs --check",
     "test:public-site": "npm run build:site && node scripts/test-public-site.mjs && node scripts/test-public-links.mjs"
   },

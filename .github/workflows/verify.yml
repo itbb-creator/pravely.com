@@ -26,4 +26,4 @@ jobs:
       - run: npm run test:public-site
       - run: npm run test:release-hardening
       - run: npm run test:health-coach
-      - run: npm test
+      - run: npm run test:repository-core

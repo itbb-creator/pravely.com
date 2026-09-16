@@ -58,15 +58,17 @@ No automatic retry was added. A failed request returns the safe unavailable stat
 - Hosted goal deletion preserves the associated budget row and clears only its goal link.
 - Hosted AI authorization allows Complete/trial to reach the provider boundary and denies Plus/expired accounts.
 - A simulated provider outage reserves the deduplicated founder alert, and the emergency kill switch returns the customer-safe unavailable response.
+- The labeled production OpenAI key returned a funded structured response through the live Health Coach on September 16, 2026.
+- The production kill switch returned the customer-safe local fallback, and normal funded AI responses resumed immediately after the switch was restored.
+- The production quota, alert-state, paywall, goal-preservation, and deletion-service migrations are applied and recorded in remote migration history.
 
 ## Checks that still require the founder
 
-- Copy the dedicated funded `OPENAI_API_KEY` into the isolated preview, set `AI_ALERT_EMAIL`, and copy the preview-safe Resend sender secrets without exposing them in chat or source control.
 - Set OpenAI project budget notification thresholds for the founder. OpenAI project budgets are alerting thresholds rather than a guaranteed hard stop, so the application quota and tested kill switch remain the enforcement controls.
-- Run one successful funded preview request and confirm the founder receives the controlled outage email. The entitlement, outage reservation, privacy-safe response, and kill-switch portions already pass.
+- Confirm the founder receives a controlled real outage email during a future provider incident or a separately approved production alert-delivery exercise. The fixed-content alert reservation and delivery path passed in preview.
 - Complete broader calculation, browser, export, payment/webhook, save-conflict, recovery-email, accessibility, backup/restore, and rollback acceptance tests.
 - Complete the broader acceptance tests in the feature truth table; passing focused tests does not certify every v1 calculation, browser, export, payment, save, recovery, or deletion journey.
 
 ## Release recommendation
 
-Do not promote the preview directly to production until the funded positive AI/email check and remaining launch-blocking acceptance tests pass. The current branches are committed locally; Git export/deployment still awaits explicit confirmation of the two named remotes and deployment risk.
+The funded AI response and kill-switch gates now pass in production. Do not treat that as certification of the remaining launch-blocking calculation, payment, recovery, export, accessibility, backup/restore, and rollback acceptance tests.

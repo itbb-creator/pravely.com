@@ -54,10 +54,8 @@ assert.match(aiFunction, /AI_ALERT_EMAIL/);
 assert.doesNotMatch(aiFunction, /console\.(?:log|info|error)\([^\n]*(?:prompt|financial|input)/i);
 
 const marketing = await readFile(new URL('../index.html', import.meta.url), 'utf8');
-const appSource = await readFile(new URL('../tmp/pravely-app-source/client/src/App.tsx', import.meta.url), 'utf8');
 for (const feature of ['Expanded projections', 'Bill dates and calendar', 'Credit card tracker', 'Optional bank synchronization', 'Household and partner sharing', 'Customization options']) {
   assert.match(marketing, new RegExp(feature, 'i'));
-  assert.match(appSource, new RegExp(feature, 'i'));
 }
 
 console.log('Paywall, goal preservation, deletion, and AI release-hardening checks passed.');

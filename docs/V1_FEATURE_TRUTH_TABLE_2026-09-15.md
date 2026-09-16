@@ -4,14 +4,14 @@ Effective date: 2026-09-15
 Launch surface: responsive web app  
 Product approver and customer-support owner: Founder (sole owner)  
 
-This is the single review sheet for what Pravely sells, where each feature works, whether it exists, how it is tested, who answers when it fails, and the exact promise customers should see. A checkmark means included in that release or plan. “Later” means the feature must not be represented as available now. “Local” means a focused automated or source-level check passed locally; it is not a production certification.
+This is the single review sheet for what Pravely sells, where each feature works, whether it exists, how it is tested, who answers when it fails, and the exact promise customers should see. A checkmark means included in that release or plan. “Later” means the feature must not be represented as available now. “Local” means a focused automated or source-level check passed locally. “Preview” means the behavior passed against the isolated hosted preview branch; it is not a production certification.
 
 | Feature | Free 7-day trial | Plus | Complete | Web | PWA | iOS | Android | Implemented | Verified | Customer support owner | Customer-facing wording |
 |---|---:|---:|---:|---:|---:|---:|---:|---|---|---|---|
-| Complete trial access | ✓ | — | — | ✓ | Later | Later | Later | Yes | Local entitlement test; live lifecycle pending | Founder | “Try the Complete experience for seven days. Purchase is required afterward.” |
-| Expired-trial paywall | ✓ | — | — | ✓ | Later | Later | Later | Yes | Source reviewed; browser preview included | Founder | “When your trial ends, the financial workspace is locked until you purchase.” |
-| Delete financial data after expiry | ✓ | ✓ | ✓ | ✓ | Later | Later | Later | Yes | UI/source reviewed; live deletion retest pending | Founder | “You can permanently delete your financial data without reopening the app.” |
-| Delete account after expiry | ✓ | ✓ | ✓ | ✓ | Later | Later | Later | Yes | UI/source reviewed; live deletion retest pending | Founder | “You can permanently delete your account and data from the locked screen.” |
+| Complete trial access | ✓ | — | — | ✓ | Later | Later | Later | Yes | Preview trial/Plus/Complete/expired gates passed | Founder | “Try the Complete experience for seven days. Purchase is required afterward.” |
+| Expired-trial paywall | ✓ | — | — | ✓ | Later | Later | Later | Yes | Preview database access gate and browser wall passed | Founder | “When your trial ends, the financial workspace is locked until you purchase.” |
+| Delete financial data after expiry | ✓ | ✓ | ✓ | ✓ | Later | Later | Later | Yes | Preview expired-account deletion passed | Founder | “You can permanently delete your financial data without reopening the app.” |
+| Delete account after expiry | ✓ | ✓ | ✓ | ✓ | Later | Later | Later | Yes | Preview expired-account deletion passed | Founder | “You can permanently delete your account and data from the locked screen.” |
 | Account authentication, recovery, and optional MFA | ✓ | ✓ | ✓ | ✓ | Later | Later | Later | Yes | Prior security preview; production email tests pending | Founder | “Secure account access with email verification, recovery, and optional MFA.” |
 | Cloud save and cross-session data loading | ✓ | ✓ | ✓ | ✓ | Later | Later | Later | Yes | Prior preview checks; two-device conflict and production-shaped tests pending | Founder | “Your plan is saved to your Pravely account.” |
 | Overview dashboard | ✓ | ✓ | ✓ | ✓ | Later | Later | Later | Yes | Type check; full calculation matrix pending | Founder | “See your budget, financial health, net worth, and next step in one view.” |
@@ -22,16 +22,16 @@ This is the single review sheet for what Pravely sells, where each feature works
 | Net-worth tracking | ✓ | ✓ | ✓ | ✓ | Later | Later | Later | Yes | Type check; large-account and cross-output tests pending | Founder | “Track assets, liabilities, and current net worth.” |
 | Net-worth projections | ✓ | — | ✓ | ✓ | Later | Later | Later | Yes | Source reviewed; fixed-example tests pending | Founder | “Explore estimated future net-worth scenarios.” |
 | Calculator suite | ✓ | ✓ | ✓ | ✓ | Later | Later | Later | Yes | Type check; boundary matrix pending | Founder | “Use emergency-fund, debt, home, investment, and retirement calculators.” |
-| Goals | ✓ | ✓ | ✓ | ✓ | Later | Later | Later | Yes | Goal-link regression test passed | Founder | “Create goals, connect monthly contributions, and track progress.” |
+| Goals | ✓ | ✓ | ✓ | ✓ | Later | Later | Later | Yes | Local regression and hosted preview preservation passed | Founder | “Create goals, connect monthly contributions, and track progress.” |
 | Advanced goal forecasts | ✓ | — | ✓ | ✓ | Later | Later | Later | Yes | Source reviewed; date-boundary tests pending | Founder | “Compare goal scenarios and estimated completion dates.” |
 | Smart planning alerts | ✓ | — | ✓ | ✓ | Later | Later | Later | Yes | Focused rule test passed; browser preview included | Founder | “Receive private in-app alerts when your plan needs attention.” |
 | Reports and exports | ✓ | — | ✓ | ✓ | Later | Later | Later | Yes | Source reviewed; cross-reader/output verification pending | Founder | “Preview and export the reports included with Complete.” |
-| AI Health Coach | ✓ | — | ✓ | ✓ | Later | Later | Later | Yes, local hardening | Input/output tests passed; funded live provider test pending | Founder | “Ask for optional educational guidance based on your Pravely calculations.” |
+| AI Health Coach | ✓ | — | ✓ | ✓ | Later | Later | Later | Yes, hardened | Preview gates, outage route, and kill switch passed; funded positive response pending | Founder | “Ask for optional educational guidance based on your Pravely calculations.” |
 | Search and navigation | ✓ | ✓ | ✓ | ✓ | Later | Later | Later | Yes | Type check; keyboard/browser tests pending | Founder | “Find features and your saved planning items quickly.” |
 | Settings, privacy choices, and data controls | ✓ | ✓ | ✓ | ✓ | Later | Later | Later | Yes | Source reviewed; full browser journey pending | Founder | “Control appearance, notifications, security, and your data.” |
 | Original Essentials workbook | Founding offer | Founding offer | Founding offer | Download | N/A | N/A | N/A | Yes | Personalization suite passed; live delivery retest pending | Founder | “The founding offer includes the free original Essentials workbook.” |
 | Product feedback and support contact | ✓ | ✓ | ✓ | ✓ | Later | Later | Later | Yes | Source reviewed; end-to-end inbox delivery pending | Founder | “Contact Pravely without sending passwords or detailed financial data.” |
-| Pravely business accounting | Admin only | Admin only | Admin only | Admin only | No | No | No | Yes, admin-gated | Source guard verified; accountant validation pending | Founder | Not a customer feature; do not market it. |
+| Pravely business accounting | Admin only | Admin only | Admin only | Admin only | No | No | No | Yes, admin-gated | Customer API denial passed in preview; accountant validation pending | Founder | Not a customer feature; do not market it. |
 | Installable PWA release | — | — | — | — | Later | — | — | Package exists | Not release-certified | Founder | “Planned after the responsive web launch.” |
 | Dedicated iOS app | — | — | — | — | — | Later | — | Project exists | Store purchase/restore, signing, and devices pending | Founder | “Planned after store and physical-device verification.” |
 | Dedicated Android app | — | — | — | — | — | — | Later | Project exists | Store purchase/restore, signing, and devices pending | Founder | “Planned after store and physical-device verification.” |

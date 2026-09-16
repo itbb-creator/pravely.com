@@ -8,6 +8,21 @@ const goalMigration = await readFile(
 assert.match(goalMigration, /on delete set null \(goal_client_key\)/i);
 assert.doesNotMatch(goalMigration, /on delete cascade/i);
 
+const accessMigration = await readFile(
+  new URL('../supabase/migrations/20260915220500_enforce_active_product_access.sql', import.meta.url),
+  'utf8',
+);
+assert.match(accessMigration, /create or replace function public\.has_active_product_access\(\)/i);
+assert.match(accessMigration, /status = 'trialing'[\s\S]*trial_ends_at > now\(\)/i);
+assert.match(accessMigration, /as restrictive for all to authenticated/i);
+
+const deletionGrantMigration = await readFile(
+  new URL('../supabase/migrations/20260915223000_grant_customer_deletion_service_access.sql', import.meta.url),
+  'utf8',
+);
+assert.match(deletionGrantMigration, /public\.business_audit_log[\s\S]*to service_role/i);
+assert.match(deletionGrantMigration, /auth\.role\(\)[\s\S]*<> 'service_role'/i);
+
 const aiMigration = await readFile(
   new URL('../supabase/migrations/20260915184913_harden_health_coach.sql', import.meta.url),
   'utf8',
@@ -45,4 +60,4 @@ for (const feature of ['Expanded projections', 'Bill dates and calendar', 'Credi
   assert.match(appSource, new RegExp(feature, 'i'));
 }
 
-console.log('Goal preservation and AI release-hardening checks passed.');
+console.log('Paywall, goal preservation, deletion, and AI release-hardening checks passed.');

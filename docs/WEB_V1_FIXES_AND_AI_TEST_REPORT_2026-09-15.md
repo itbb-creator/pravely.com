@@ -1,7 +1,7 @@
 # Web v1 fixes and AI integration test report
 
 Date: 2026-09-15  
-Status: local preview only; not pushed or deployed
+Status: isolated hosted preview validated; production promotion still pending
 
 ## Outcome
 
@@ -50,16 +50,23 @@ No automatic retry was added. A failed request returns the safe unavailable stat
 - Static release-hardening checks for the goal foreign key, AI RLS/revokes, server-only quota, timeout, output limit, kill switch, deletion coverage, and privacy-safe logging.
 - Existing workbook-personalization suite.
 - Visual browser review of the current-vs-future plan screen, smart-alert notification, expired-trial deletion page, and AI unavailable state.
+- All migrations applied cleanly to the isolated no-production-data Supabase preview branch.
+- Trial, Plus, and Complete accounts can read and write financial workspace data in the hosted preview.
+- Expired customers are blocked at both the interface and database boundaries.
+- Expired customers can still delete financial data or the entire account without regaining workspace access.
+- Customer access to founder-only business accounting is denied by the hosted API.
+- Hosted goal deletion preserves the associated budget row and clears only its goal link.
+- Hosted AI authorization allows Complete/trial to reach the provider boundary and denies Plus/expired accounts.
+- A simulated provider outage reserves the deduplicated founder alert, and the emergency kill switch returns the customer-safe unavailable response.
 
-## Checks that still require the founder or a production-shaped preview
+## Checks that still require the founder
 
-- Apply the two new database migrations and deploy the changed `health-coach`, deletion, and app builds to a non-production preview.
-- Confirm the dedicated funded OpenAI project's hard spend limit and founder notification thresholds, then run one real positive request plus provider refusal, quota, timeout, and exhausted-credit cases.
-- Exercise server authorization with real trial, Plus, Complete, expired, and revoked accounts. Local authorization tests do not prove hosted policy or secret configuration.
-- Verify the new deletion actions against hosted data and confirm the AI quota table is included in both financial-data and account deletion.
-- Route AI outage/spend alerts to the founder and test the kill switch.
+- Copy the dedicated funded `OPENAI_API_KEY` into the isolated preview, set `AI_ALERT_EMAIL`, and copy the preview-safe Resend sender secrets without exposing them in chat or source control.
+- Set OpenAI project budget notification thresholds for the founder. OpenAI project budgets are alerting thresholds rather than a guaranteed hard stop, so the application quota and tested kill switch remain the enforcement controls.
+- Run one successful funded preview request and confirm the founder receives the controlled outage email. The entitlement, outage reservation, privacy-safe response, and kill-switch portions already pass.
+- Complete broader calculation, browser, export, payment/webhook, save-conflict, recovery-email, accessibility, backup/restore, and rollback acceptance tests.
 - Complete the broader acceptance tests in the feature truth table; passing focused tests does not certify every v1 calculation, browser, export, payment, save, recovery, or deletion journey.
 
 ## Release recommendation
 
-Do not push these changes directly to production. Review the open local previews first, then deploy to a preview environment, apply migrations, execute the live acceptance cases, and promote only if every launch-blocking test passes.
+Do not promote the preview directly to production until the funded positive AI/email check and remaining launch-blocking acceptance tests pass. The current branches are committed locally; Git export/deployment still awaits explicit confirmation of the two named remotes and deployment risk.

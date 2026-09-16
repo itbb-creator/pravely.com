@@ -52,7 +52,7 @@ Nothing else should be called launch-ready until this gate is complete.
 - [x] Remove current-availability claims and customer controls for deferred/removed features; show native apps, biometrics, and annual review only in a clearly future roadmap section.
 - [x] Define a concrete acceptance test and support response for every v1 feature group in the feature truth table.
 - [ ] Designate one product catalog as the source of truth for names, plan prices, upgrade price, trial, entitlements, features, and effective date. Generate or validate the website, app, Stripe configuration, emails, help text, and store metadata against it.
-- [ ] Archive or clearly label historical workbook-first launch documents so they cannot be copied into current campaigns or operating procedures.
+- [x] Archive or clearly label historical workbook-first launch documents so they cannot be copied into current campaigns or operating procedures.
 - [x] Assign the founder as the single owner who can approve v1 scope and reject late feature additions.
 
 ### Contradictions found during the audit
@@ -122,7 +122,7 @@ The first seven customer-facing contradictions above were corrected locally for 
 
 ### 5. AI feature decision
 
-- [ ] Either fund, retain, and positively test the AI Health Coach, or remove it from v1 navigation and plan claims.
+- [ ] Retain and positively test the funded AI Health Coach. Local validation, hosted entitlement denial, provider-outage handling, alert reservation, and kill-switch tests pass; one successful funded preview response remains.
 - [ ] If retained, set a hard monthly spend cap, per-user/request limits, timeout, retry policy, and a user-friendly unavailable state.
 - [ ] Test prompt-injection-like user input, extremely long input, malformed responses, provider refusal, rate limiting, network failure, and exhausted credit.
 - [ ] Confirm responses never change deterministic calculations or execute financial actions.
@@ -155,7 +155,7 @@ The first seven customer-facing contradictions above were corrected locally for 
 
 ### 8. Performance and compatibility quality bar
 
-- [ ] Rerun the production build in a clean environment. The September 15 local attempt ended in a machine `ENOMEM` error; do not misclassify that as a passed build or a product defect.
+- [x] Rerun the production build in a clean environment. The full client/server production build passed on September 15 after the product-gate changes.
 - [ ] Add a performance budget for first load, authenticated load, save response, chart interaction, and export generation on a mid-range phone and slower network.
 - [ ] Test realistic large data sets for browser memory and long-session stability.
 - [ ] Verify no private financial values appear in URLs, page titles, notification previews, analytics events, crash reports, console logs, or third-party requests.
@@ -170,7 +170,7 @@ The first seven customer-facing contradictions above were corrected locally for 
 - [ ] Remove hard-coded production endpoints from build logic where they make accidental production builds possible; fail the build when required environment values are missing or inconsistent.
 - [ ] Inventory every secret and public key, its owner, environment, rotation procedure, last rotation, and dependent service. Store values only in the approved secret manager/password manager.
 - [ ] Review repository history and built artifacts for accidentally committed secrets, not only the current files.
-- [ ] Pin the supported Node version to 22 or later. The root package currently says Node 20+, while Supabase client libraries dropped Node 20 support in 2026.
+- [x] Pin both repositories to Node 22 or later.
 - [ ] Resolve package provenance and remove unused server/auth/database packages from the client application if they are not part of the production architecture.
 
 ### 10. Continuous verification

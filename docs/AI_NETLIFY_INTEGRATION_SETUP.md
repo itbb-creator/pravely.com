@@ -524,6 +524,9 @@ Still outstanding from your September 9 status document.
    Cloudflare matches subdomains of a listed hostname, so
    `pravelyapp.netlify.app` covers `deploy-preview-1--pravelyapp.netlify.app`.
    Confirm this on the widget's settings page rather than assuming it.
+
+   The same rule means `books.pravely.com` needs no entry of its own; the
+   `pravely.com` line covers it. See 14.3.
 6. **Widget mode:** **Managed**
 7. Click **Create**.
 8. Copy the **Site Key** into Netlify production scope per Part 8.
@@ -673,6 +676,160 @@ was pushed, regardless of how quickly it was removed.
 
 ---
 
+## Part 14 — Pravely Books (`books.pravely.com`)
+
+Pravely Books is the internal bookkeeping tool. It is a second, separate build
+of the `Pravely` repo, not a third repo and not part of the customer app. It
+went live on 16 September 2026.
+
+### 14.1 Why it exists
+
+The `business_*` tables were always admin-only and always required AAL2, so the
+accounting module was never a customer feature. It was still **compiled into the
+customer bundle**: the app imported it statically and only hid the rendering
+behind an admin check, so the internal tooling was readable in devtools by
+anyone. Splitting it into its own build removes it from the customer bundle
+entirely.
+
+### 14.2 Netlify site configuration
+
+A separate Netlify site, publishing a different output directory from the same
+repository:
+
+| Setting | Value |
+| --- | --- |
+| Branch to deploy | `preview` (see 14.4 before changing this) |
+| Build command | `npm run build:books` |
+| Publish directory | `dist-books` |
+| Custom domain | `books.pravely.com` |
+
+`npm run build` and `npm run build:books` write to `dist/` and `dist-books/`
+respectively and never collide, so the app site and the books site can build
+from the same commit without interfering.
+
+No Netlify environment variables are required on the books site. The Supabase
+URL, the Supabase publishable key, and the Turnstile site key all have
+production fallbacks compiled into the client, so an unset variable yields the
+production value rather than an empty one. That is deliberate: it is the same
+"missing key disables the captcha silently" failure described in 8.2, and the
+fallback is what prevents it.
+
+### 14.3 Turnstile needs no new hostname
+
+`books.pravely.com` does **not** need its own entry in the Part 9 hostname
+allowlist. Cloudflare Turnstile matches subdomains of a listed hostname, and
+`pravely.com` is already listed, so the subdomain was covered the moment DNS
+resolved.
+
+This was verified by signing in, not by reading configuration. The sign-in form
+refuses to submit without a captcha token, so a hostname Cloudflare rejected
+would have blocked the attempt. A successful sign-in is therefore proof that the
+widget rendered, Cloudflare issued a token for this hostname, and Supabase
+accepted it.
+
+Squarespace holding the DNS has no bearing on this. Turnstile only checks the
+hostname.
+
+### 14.4 Which branch the books site should deploy
+
+It deploys `preview` today, which means the tool used for real bookkeeping
+tracks the integration branch and changes on every merge, with no release step.
+`main` would be the better source.
+
+**It cannot move yet.** As of 16 September 2026 `main` contains no `books/`
+directory, no `vite.books.config.ts`, no `script/build-books.ts`, and no
+`build:books` script. Pointing the books site at `main` today fails the build
+immediately.
+
+Moving it is blocked behind a larger problem: **`main` and `preview` have
+diverged.** Their merge base is `96bbd51` "Keep MFA authenticator-only", from
+15 September. Since then `main` has taken three direct pushes that never went
+through `preview`:
+
+| Commit | Subject |
+| --- | --- |
+| `4a62e47` | Complete web v1 product gates |
+| `09a8a23` | Add hosted web v1 acceptance suite |
+| `404a013` | Clarify internal accounting and add release checks |
+
+`preview` is fifteen commits ahead on its own line, carrying the Books split and
+the officer skills.
+
+### 14.5 What the merge actually does
+
+`git merge origin/main` into `preview` produces **one conflict**, in the
+`client/src/App.tsx` sidebar. `preview` deleted the "Business accounting" nav
+item when the module moved to Pravely Books; `main`'s `404a013` renamed its
+label to "Pravely accounting". Resolve it in `preview`'s favour: the item should
+not exist in the customer app at all.
+
+Keep `main`'s relabel inside `Accounting.tsx`. Pravely Books renders that page,
+and the clearer wording belongs there.
+
+The other three pieces of the split — the `AccountingPage` import, the
+`"accounting"` member of the `View` type, and the render block — merge correctly
+with no intervention. `package.json` also merges cleanly in both directions,
+keeping `build:books` from `preview` alongside `engines.node >= 22` and the
+three test scripts from `main`.
+
+**Verify the outcome anyway.** Typecheck, tests and both builds all pass happily
+with the accounting module compiled back into the customer app, so none of them
+can tell you whether the split survived. The only check that can is a grep of
+the built bundle:
+
+```
+grep -rE 'business_(accounts|transactions|invoices|contacts)' dist/public
+```
+
+That must return nothing. Grep the build output, not the source — a source grep
+passes while the bundle is still wrong.
+
+`main` also adds `.github/workflows/verify.yml`, which runs on every pull
+request: a tracked-file secret scan, `npm run check`, four test scripts,
+`npm run build`, and `npm audit`. As written it builds the customer app only, so
+it covers neither the Books build nor the property above.
+
+### 14.6 The order that keeps production safe
+
+1. Merge `main` **into** `preview` on a branch. A broken result costs nothing
+   there. Never resolve any of this on `main`.
+2. Resolve the single `App.tsx` conflict as described in 14.5.
+3. Verify: `npm run check`, `npm run build`, `npm run build:books`, the four
+   test scripts, and the `dist/public` grep above.
+4. Add `npm run build:books` and that grep to `verify.yml` so neither can
+   regress unnoticed.
+5. Only then open `preview` → `main`, which by the rules in Part 10 is the
+   owner's merge to make.
+6. After that lands, change the books site's branch to `main` and redeploy.
+7. Sign in at `books.pravely.com` and confirm the captcha widget renders and the
+   ledger loads before considering the move done.
+
+Steps 1 to 4 are done in `Pravely` pull request #5. Until step 5, production
+still ships the accounting module inside the customer app. The split exists only
+on `preview`.
+
+### 14.7 A caution about stale refs
+
+The first version of this section reported that the merge was clean and silently
+undid the split. That was wrong, and worth recording because the mistake is easy
+to repeat: the local clone's `origin/preview` was stale, pinned a commit before
+the Books split, so the merge was computed against the wrong base.
+
+Before reasoning about what a merge will do, force-update the refs and confirm
+the tips are what you expect:
+
+```
+git fetch origin preview:refs/remotes/origin/preview --force
+git log --oneline -1 origin/preview
+```
+
+A shallow or long-lived clone is the usual culprit. Paginated commit listings
+from the GitHub API mislead the same way: they show a window, not the graph, and
+two branches whose recent commits do not overlap can still share a base a few
+commits back. Use `git merge-base` rather than inferring divergence from a list.
+
+---
+
 ## Setup checklist
 
 Part 0, urgent:
@@ -712,3 +869,12 @@ Then:
 
 - [ ] Add `CLAUDE.md` to both repos
 - [ ] Optionally connect the Netlify MCP server from the local CLI
+
+Pravely Books, see Part 14:
+
+- [x] Books site building `npm run build:books` into `dist-books`
+- [x] `books.pravely.com` resolving, sign-in and ledger confirmed working
+- [x] Turnstile hostname confirmed covered by the `pravely.com` entry
+- [x] Merge `main` → `preview` with the accounting nav conflict resolved (`Pravely` #5)
+- [ ] Merge `preview` → `main` so production stops shipping accounting to customers
+- [ ] Repoint the books site from `preview` to `main`

@@ -1,5 +1,7 @@
 # Pravely security configuration and backup runbook
 
+> **Mixed-scope operations document.** Workbook sections apply only to companion workbook delivery. Web-app security and backup controls remain active; this file does not define launch scope or customer-facing product claims.
+
 This runbook covers the security work that cannot be completed safely from source code alone. Complete these steps in a non-production or preview environment first. Never paste a secret into source control, a URL, a support ticket, or a screenshot.
 
 Pravely is operated by one owner. Wherever an older checklist says “IT officer,” “security officer,” or “second administrator,” read it as **the owner/operator** unless a genuinely independent recovery identity is specifically required. The current launch catalog is **three paid app offers** (Plus, Complete, and the Plus-to-Complete upgrade) plus the **free Essentials launch offer**. Legacy workbook-delivery files may remain only to support prior customers and records; they are not the current direct-sales catalog.

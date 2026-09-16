@@ -8,6 +8,7 @@ const PERSONAL_TABLES = [
   ['app_feedback', 'user_id'],
   ['operational_events', 'user_id'],
   ['push_device_tokens', 'user_id'],
+  ['health_coach_rate_limits', 'user_id'],
   ['user_settings', 'user_id'],
 ] as const;
 

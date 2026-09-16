@@ -1,5 +1,7 @@
 # Pravely preview release status
 
+> **Historical preview evidence.** This file records the September 9 environment only and must not be used as current deployment status or launch approval.
+
 Date: September 9, 2026  
 Production and Netlify status: **untouched**  
 Supabase test target: isolated branch `security-preview` (`eiaxrrkanqnrvvloszss`)

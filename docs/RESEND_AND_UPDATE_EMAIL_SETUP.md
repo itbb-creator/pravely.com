@@ -1,5 +1,7 @@
 # Resend and customer update email setup
 
+> **Companion workbook delivery and legacy email operations.** Validate every message against the current web-app product truth table before enabling or reusing it.
+
 The codebase already sends two kinds of transactional email:
 
 1. A purchase email after Stripe confirms payment. It contains the customer's stable licensed download page.

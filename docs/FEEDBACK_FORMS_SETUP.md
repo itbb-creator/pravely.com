@@ -1,5 +1,7 @@
 # Founding customer feedback forms setup
 
+> **Historical/companion workflow.** Do not enable these workbook-era forms or check-in sequences for web v1 without founder review against the current consent and support process.
+
 The homepage has two Netlify Forms:
 
 - `feedback`: product ideas, purchase objections, and the 7-day/14-day founding customer check-ins.

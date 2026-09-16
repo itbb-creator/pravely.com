@@ -1,5 +1,7 @@
 # Limited paid-launch readiness
 
+> **SUPERSEDED — DO NOT USE AS THE WEB-V1 LAUNCH CHECKLIST.** Use `PRE_LAUNCH_MASTER_PLAN_2026-09-15.md` and the dated feature truth table instead.
+
 ## Recommendation
 
 Run a small, invitation-style paid launch before adding a full customer portal. The

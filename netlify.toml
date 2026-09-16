@@ -2,8 +2,8 @@
 # Netlify reads this file automatically when you import the repo.
 
 [build]
-  publish = "."
-  command = ""
+  publish = "site-dist"
+  command = "npm run build:site"
 
 # Friendly 404
 [[redirects]]
@@ -32,6 +32,11 @@
 [[redirects]]
   from = "/changelog"
   to = "/changelog.html"
+  status = 200
+
+[[redirects]]
+  from = "/features"
+  to = "/features.html"
   status = 200
 
 [[redirects]]
@@ -98,6 +103,11 @@
 
 [[headers]]
   for = "/changelog.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/features.html"
   [headers.values]
     Cache-Control = "public, max-age=0, must-revalidate"
 

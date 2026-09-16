@@ -37,6 +37,7 @@ The source is stronger than an early prototype: focused entitlement, debt-payoff
 - The original Essentials workbook is included in the founding offer. Whether it remains a free marketing asset afterward is deliberately undecided.
 - Web v1 includes smart planning alerts and the AI Health Coach. Annual financial review and biometric lock are later releases.
 - Pravely business accounting is founder/admin-only and must never be marketed or exposed as a customer-plan feature.
+- Pravely accounting is an internal admin utility only. A dedicated external accounting product should remain the company system of record; the internal view may later summarize or reconcile approved source data.
 - The founder is the sole product approver and current customer-support owner.
 - The dated feature truth table in `docs/V1_FEATURE_TRUTH_TABLE_2026-09-15.md` is the launch-scope source of truth until the founder approves a replacement.
 
@@ -46,6 +47,7 @@ Nothing else should be called launch-ready until this gate is complete.
 
 - [x] Choose and record the first public surface. Launch the responsive web app first; PWA, iOS, and Android are later releases.
 - [x] Create the dated feature truth table with plan, platform, implementation, verification, owner, and customer-wording columns.
+- [x] Publish the living feature truth table as a separate marketing-site page linked from the changelog and generated from the approved source document.
 - [x] Define the seven-day Complete experience as a time-limited app trial; the original workbook is a separate founding-offer giveaway.
 - [x] Block the entire financial workspace after expiry while retaining only plan purchase, sign-out, and separate deletion controls.
 - [x] Fix web-v1 scope: include AI Health Coach and smart alerts; keep business accounting admin-only; defer annual review, mobile notifications, biometric lock, PWA, and native apps; remove the unfinished walkthrough and contribution controls.
@@ -62,7 +64,7 @@ Nothing else should be called launch-ready until this gate is complete.
 - Getting started contains “Video walkthrough coming soon.”
 - The personal-plan report labels the customer “Beta member.” Apple explicitly rejects beta versions from normal App Store distribution.
 - The Settings page exposes disabled “Buy us a coffee” controls when payment links are absent.
-- Business accounting is visible, but its own review states that payment posting is not atomic and that tax allocation, reconciliation, concurrency, idempotency, receipt-storage, and financial acceptance testing remain incomplete.
+- Internal accounting is restricted to admin-designated accounts and excluded from customer claims; it is explicitly labeled as not being Pravely’s approved accounting system of record.
 - AI Health Coach has a deterministic preview fallback; the last positive hosted check was blocked by exhausted OpenAI credit.
 - Older operating documents still refer to a $36 Premium workbook offer and workbook-first launch even though the current website sells the app at $89 Plus / $159 Complete with a $70 upgrade.
 
@@ -142,8 +144,8 @@ The first seven customer-facing contradictions above were corrected locally for 
 
 ### 7. Customer-facing completeness and usability
 
-- [ ] Remove “coming soon,” “Beta member,” disconnected controls, dead social links, sample testimonials, sample customer data, and obsolete pricing from every public asset.
-- [ ] Replace `#` Instagram/TikTok destinations or remove those links until real profiles exist.
+- [x] Remove “coming soon,” “Beta member,” disconnected controls, dead social links, sample testimonials, sample customer data, and obsolete pricing from every deployed public asset. The public-site allowlist and automated audit passed September 16.
+- [x] Replace `#` Instagram/TikTok destinations or remove those links until real profiles exist. Only the verified Facebook destination is currently published.
 - [ ] Verify every button, link, form, empty state, error state, toast, dialog, back action, and destructive confirmation has a complete outcome.
 - [ ] Verify the 404 page, offline page, expired-session state, maintenance/unavailable state, payment failure, email failure, and partial-save failure tell the customer what to do next.
 - [ ] Make support reachable from every high-risk failure state without requiring the user to expose financial data.
@@ -166,21 +168,21 @@ The first seven customer-facing contradictions above were corrected locally for 
 ### 9. Repository and environment control
 
 - [ ] Document that the marketing site and application are separate repositories/checkouts with separate release histories. Assign ownership and prevent one from being updated without the corresponding claim check in the other.
-- [ ] Establish production, preview/staging, and local environments with visibly different project references and only test credentials in preview.
+- [x] Establish production, preview/staging, and local environments with visibly different project references and only test credentials in preview. The isolated Supabase preview is `web-v1-launch-preview`; production was not used for synthetic account tests.
 - [ ] Remove hard-coded production endpoints from build logic where they make accidental production builds possible; fail the build when required environment values are missing or inconsistent.
 - [ ] Inventory every secret and public key, its owner, environment, rotation procedure, last rotation, and dependent service. Store values only in the approved secret manager/password manager.
-- [ ] Review repository history and built artifacts for accidentally committed secrets, not only the current files.
+- [x] Review repository history, tracked files, and built artifacts for common live-secret formats. No matching OpenAI, Stripe, Resend, or AWS live-secret patterns were found on September 16; automated tracked-file checks now run on both repositories.
 - [x] Pin both repositories to Node 22 or later.
 - [ ] Resolve package provenance and remove unused server/auth/database packages from the client application if they are not part of the production architecture.
 
 ### 10. Continuous verification
 
-- [ ] Add continuous checks for TypeScript, production build, focused unit tests, dependency audit, secret scanning, and static security checks on every change.
+- [x] Add continuous checks for TypeScript, production build, focused unit tests, dependency audit, tracked-file secret scanning, public-asset/link checks, and static release-security checks on every change in both repositories.
 - [ ] Add migration checks for RLS on exposed tables, ownership policies, unsafe grants, public `SECURITY DEFINER` functions, non-security-invoker views, missing indexes, and migration drift.
 - [ ] Add browser smoke tests for signup, verification callback, login, recovery, trial, save/sync, plan gates, checkout return, deletion, and key calculations.
 - [ ] Add an offer-consistency check across website, in-app plans, Stripe catalog export, email templates, changelog, screenshots, and active campaign copy.
 - [ ] Treat the current two focused app tests and workbook-personalization suite as a starting point, not sufficient release coverage.
-- [ ] Make a failed build, failed migration check, failed security check, or failed critical journey block deployment.
+- [x] Make failed automated builds, focused tests, dependency audit, secret-pattern checks, and release-hardening checks fail the repository verification workflow. Hosted critical journeys remain a separate promotion gate.
 
 ### 11. Release and rollback process
 

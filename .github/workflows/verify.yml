@@ -1,0 +1,29 @@
+name: Verify marketing and platform release
+
+on:
+  pull_request:
+  push:
+    branches: [main, "codex/**"]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Scan tracked files for common live-secret formats
+        shell: bash
+        run: |
+          if git grep -IlE '(sk_live_[A-Za-z0-9]{16,}|rk_live_[A-Za-z0-9]{16,}|whsec_[A-Za-z0-9]{16,}|sk-proj-[A-Za-z0-9_-]{16,}|sk-svcacct-[A-Za-z0-9_-]{16,}|re_[A-Za-z0-9]{20,}|AKIA[0-9A-Z]{16})'; then
+            echo 'A secret-shaped value was found in a tracked file.'
+            exit 1
+          fi
+      - run: npm run test:public-site
+      - run: npm run test:release-hardening
+      - run: npm run test:health-coach
+      - run: npm test

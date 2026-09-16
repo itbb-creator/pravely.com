@@ -1,0 +1,35 @@
+import assert from 'node:assert/strict';
+import { access, readFile, readdir } from 'node:fs/promises';
+
+const root = new URL('../', import.meta.url);
+const output = new URL('../site-dist/', import.meta.url);
+const publicPages = (await readdir(output)).filter((name) => /\.(?:html|json)$/.test(name));
+const text = (await Promise.all(publicPages.map((name) => readFile(new URL(name, output), 'utf8')))).join('\n');
+
+for (const forbidden of [
+  /coming soon/i,
+  /beta member/i,
+  /href=["']#["']/i,
+  /Good morning, Jordan/i,
+  /\$36\b/,
+]) assert.doesNotMatch(text, forbidden);
+
+assert.doesNotMatch(text, /"instagram"\s*:\s*"#"/i);
+assert.doesNotMatch(text, /"tiktok"\s*:\s*"#"/i);
+assert.match(text, /Feature availability/i);
+assert.match(text, /facebook\.com\/profile\.php\?id=61593162213256/i);
+
+for (const privatePath of [
+  'docs',
+  'scripts',
+  'supabase',
+  'marketing',
+  'tmp',
+  'node_modules',
+  'assets/masters',
+  '.env.supabase.example',
+]) {
+  await assert.rejects(access(new URL(privatePath, output)), `Private path was published: ${privatePath}`);
+}
+
+console.log(`Public-site audit passed across ${publicPages.length} HTML/JSON files; internal paths are excluded.`);

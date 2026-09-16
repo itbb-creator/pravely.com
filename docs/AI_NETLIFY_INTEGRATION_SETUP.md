@@ -755,52 +755,78 @@ through `preview`:
 `preview` is fifteen commits ahead on its own line, carrying the Books split and
 the officer skills.
 
-### 14.5 The merge is clean, and that is the danger
+### 14.5 What the merge actually does
 
-`git merge origin/main` into `preview` reports **zero conflicts**. Do not read
-that as "safe to merge". The clean merge **silently undoes the Books split**.
+`git merge origin/main` into `preview` produces **one conflict**, in the
+`client/src/App.tsx` sidebar. `preview` deleted the "Business accounting" nav
+item when the module moved to Pravely Books; `main`'s `404a013` renamed its
+label to "Pravely accounting". Resolve it in `preview`'s favour: the item should
+not exist in the customer app at all.
 
-`4a62e47` rewrote 307 lines of `client/src/App.tsx`, including the regions the
-split had deleted. Git saw no conflict, took `main`'s version of those regions,
-and reinstated all four pieces of the accounting module in the customer app:
+Keep `main`'s relabel inside `Accounting.tsx`. Pravely Books renders that page,
+and the clearer wording belongs there.
 
-- the `import AccountingPage from "./Accounting"` statement
-- the `"accounting"` member of the `View` type
-- the sidebar nav item, now relabelled "Pravely accounting" by `404a013`
-- the `{active === "accounting" && user.isAdmin && <AccountingPage />}` block
+The other three pieces of the split — the `AccountingPage` import, the
+`"accounting"` member of the `View` type, and the render block — merge correctly
+with no intervention. `package.json` also merges cleanly in both directions,
+keeping `build:books` from `preview` alongside `engines.node >= 22` and the
+three test scripts from `main`.
 
-That is exactly the static import the split existed to remove, so the merged
-customer bundle contains the internal tooling again. This is the failure mode
-where git is working correctly and the result is still wrong: a deletion on one
-side and a wholesale rewrite on the other resolve in the rewriter's favour
-without a conflict marker to warn anyone.
+**Verify the outcome anyway.** Typecheck, tests and both builds all pass happily
+with the accounting module compiled back into the customer app, so none of them
+can tell you whether the split survived. The only check that can is a grep of
+the built bundle:
 
-So the merge needs a deliberate step after it, not just a conflict check.
+```
+grep -rE 'business_(accounts|transactions|invoices|contacts)' dist/public
+```
+
+That must return nothing. Grep the build output, not the source — a source grep
+passes while the bundle is still wrong.
 
 `main` also adds `.github/workflows/verify.yml`, which runs on every pull
 request: a tracked-file secret scan, `npm run check`, four test scripts,
-`npm run build`, and `npm audit`. It does **not** run `npm run build:books`, so
-the Books build stays uncovered by CI until that line is added.
+`npm run build`, and `npm audit`. As written it builds the customer app only, so
+it covers neither the Books build nor the property above.
 
 ### 14.6 The order that keeps production safe
 
-1. Merge `main` **into** `preview` first, on a branch. A broken result costs
-   nothing there. Never resolve any of this on `main`.
-2. **Re-remove the four accounting pieces from `client/src/App.tsx`** listed in
-   14.5. The merge will have put them back without saying so.
-3. Verify, and do not skip the last one: `npm run check`, `npm run build`,
-   `npm run build:books`, and confirm the built customer bundle contains no
-   `business_*` reference. Grep the build output, not the source.
-4. Consider adding `npm run build:books` to `verify.yml` so this cannot regress
-   unnoticed again.
+1. Merge `main` **into** `preview` on a branch. A broken result costs nothing
+   there. Never resolve any of this on `main`.
+2. Resolve the single `App.tsx` conflict as described in 14.5.
+3. Verify: `npm run check`, `npm run build`, `npm run build:books`, the four
+   test scripts, and the `dist/public` grep above.
+4. Add `npm run build:books` and that grep to `verify.yml` so neither can
+   regress unnoticed.
 5. Only then open `preview` → `main`, which by the rules in Part 10 is the
    owner's merge to make.
 6. After that lands, change the books site's branch to `main` and redeploy.
 7. Sign in at `books.pravely.com` and confirm the captcha widget renders and the
    ledger loads before considering the move done.
 
-Until step 5, production still ships the accounting module inside the customer
-app. The split exists only on `preview`.
+Steps 1 to 4 are done in `Pravely` pull request #5. Until step 5, production
+still ships the accounting module inside the customer app. The split exists only
+on `preview`.
+
+### 14.7 A caution about stale refs
+
+The first version of this section reported that the merge was clean and silently
+undid the split. That was wrong, and worth recording because the mistake is easy
+to repeat: the local clone's `origin/preview` was stale, pinned a commit before
+the Books split, so the merge was computed against the wrong base.
+
+Before reasoning about what a merge will do, force-update the refs and confirm
+the tips are what you expect:
+
+```
+git fetch origin preview:refs/remotes/origin/preview --force
+git log --oneline -1 origin/preview
+```
+
+A shallow or long-lived clone is the usual culprit. Paginated commit listings
+from the GitHub API mislead the same way: they show a window, not the graph, and
+two branches whose recent commits do not overlap can still share a base a few
+commits back. Use `git merge-base` rather than inferring divergence from a list.
 
 ---
 
@@ -849,6 +875,6 @@ Pravely Books, see Part 14:
 - [x] Books site building `npm run build:books` into `dist-books`
 - [x] `books.pravely.com` resolving, sign-in and ledger confirmed working
 - [x] Turnstile hostname confirmed covered by the `pravely.com` entry
-- [ ] Merge `main` → `preview`, then re-remove the accounting pieces the clean merge restores
+- [x] Merge `main` → `preview` with the accounting nav conflict resolved (`Pravely` #5)
 - [ ] Merge `preview` → `main` so production stops shipping accounting to customers
 - [ ] Repoint the books site from `preview` to `main`

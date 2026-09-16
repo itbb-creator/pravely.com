@@ -11,7 +11,10 @@ OpenAI API key with funded usage is stored as an Edge Function secret.
 1. Create a project API key in the OpenAI platform. Use a dedicated Pravely
    project so usage and limits are isolated from other applications.
 2. In Supabase, open **Project Settings → Edge Functions → Secrets**.
-3. Add `OPENAI_API_KEY` with the key as its value.
+3. Add the isolated keys as `OPENAI_API_KEY_PREVIEW` and
+   `OPENAI_API_KEY_PRODUCTION`. Set `OPENAI_KEY_ENV` to `preview` in the
+   preview project and `production` in the production project. The legacy
+   `OPENAI_API_KEY` remains a fallback during migration only.
 4. Optionally add `OPENAI_HEALTH_MODEL`. If omitted, Pravely uses
    `gpt-5.4-mini`.
 5. Add `HEALTH_COACH_HOURLY_LIMIT`. Every submitted request reserves one unit
@@ -31,7 +34,7 @@ to hosted Edge Functions without a code redeploy.
 CLI alternative:
 
 ```sh
-supabase secrets set OPENAI_API_KEY=YOUR_KEY OPENAI_HEALTH_MODEL=gpt-5.4-mini
+supabase secrets set OPENAI_API_KEY_PRODUCTION=YOUR_KEY OPENAI_KEY_ENV=production OPENAI_HEALTH_MODEL=gpt-5.4-mini
 ```
 
 ## Current integration

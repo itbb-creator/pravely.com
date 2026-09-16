@@ -5,6 +5,7 @@ const root = new URL('../', import.meta.url);
 const output = new URL('../site-dist/', import.meta.url);
 const publicPages = (await readdir(output)).filter((name) => /\.(?:html|json)$/.test(name));
 const text = (await Promise.all(publicPages.map((name) => readFile(new URL(name, output), 'utf8')))).join('\n');
+const featurePage = await readFile(new URL('features.html', output), 'utf8');
 
 for (const forbidden of [
   /coming soon/i,
@@ -12,12 +13,14 @@ for (const forbidden of [
   /href=["']#["']/i,
   /Good morning, Jordan/i,
   /\$36\b/,
+  /Every free Pravely account includes/i,
 ]) assert.doesNotMatch(text, forbidden);
 
 assert.doesNotMatch(text, /"instagram"\s*:\s*"#"/i);
 assert.doesNotMatch(text, /"tiktok"\s*:\s*"#"/i);
 assert.match(text, /Feature availability/i);
 assert.match(text, /facebook\.com\/profile\.php\?id=61593162213256/i);
+assert.doesNotMatch(featurePage, /Pravely (?:internal|business) accounting/i);
 
 for (const privatePath of [
   'docs',

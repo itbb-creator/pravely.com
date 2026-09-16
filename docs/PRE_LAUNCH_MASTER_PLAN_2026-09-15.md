@@ -81,7 +81,7 @@ The first seven customer-facing contradictions above were corrected locally for 
 - [ ] Verify editing or deleting a source entry updates every dashboard, score, chart, forecast, and report that depends on it.
 - [ ] Verify month rollover, back-dated entries, future entries, and the chosen reporting period do not move transactions into the wrong month.
 - [ ] Define and test behavior for duplicated records and rapid double-submission.
-- [ ] If Business accounting remains in v1, make invoice/payment/journal posting one atomic server operation; add tax, partial-payment, overpayment, void, reversal, concurrency, idempotency, and reconciliation acceptance tests. Otherwise hide it from non-admin customers.
+- [x] Exclude Pravely accounting from the customer product and public feature matrix; keep the internal utility hidden from non-admin customers and deny customer API access.
 - [ ] Have a qualified accountant review only the accounting feature's calculations and outputs before the product represents them as company books or tax preparation.
 
 ### 2. Saving, sync, and data durability

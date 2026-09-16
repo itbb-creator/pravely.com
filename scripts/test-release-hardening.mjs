@@ -16,6 +16,13 @@ assert.match(accessMigration, /create or replace function public\.has_active_pro
 assert.match(accessMigration, /status = 'trialing'[\s\S]*trial_ends_at > now\(\)/i);
 assert.match(accessMigration, /as restrictive for all to authenticated/i);
 
+const adminAccessMigration = await readFile(
+  new URL('../supabase/migrations/20260916192125_allow_admin_product_access.sql', import.meta.url),
+  'utf8',
+);
+assert.match(adminAccessMigration, /auth\.jwt\(\)[\s\S]*app_metadata[\s\S]*role[\s\S]*admin/i);
+assert.match(adminAccessMigration, /app_entitlements[\s\S]*trial_ends_at > now\(\)/i);
+
 const deletionGrantMigration = await readFile(
   new URL('../supabase/migrations/20260915223000_grant_customer_deletion_service_access.sql', import.meta.url),
   'utf8',

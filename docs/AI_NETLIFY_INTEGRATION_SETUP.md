@@ -839,7 +839,8 @@ than no checklist, because it reports work that was never done as finished.
 ### Done, with the evidence
 
 - [x] `preview` exists in both repos, and `CLAUDE.md` is in both
-- [x] Branch protection on `pravely.com` — the API reports `main` and
+- [x] Branch protection on `pravely.com` — `protect-main` and `preview-flow`
+      both exist with `enforcement: active`, and the API reports `main` and
       `preview` as `protected: true`
 - [x] The real `Pravely authentication` Turnstile widget exists and is in use.
       Its production site key is the compiled fallback in
@@ -860,14 +861,33 @@ than no checklist, because it reports work that was never done as finished.
 
 ### Open, and verifiable from the repos
 
-- [ ] **Branch protection is missing on the `Pravely` repo.** The API reports
-      `main` and `preview` as `protected: false`, while `pravely.com` has both
-      protected. This is the wrong way round: `Pravely` is the repo holding
-      authentication, billing and the customer database, and its production
-      branch currently accepts a direct push. Create the `protect-main` and
-      `preview-flow` rulesets there per Parts 4 and 5
-- [ ] Add the Netlify status check and the `verify` workflow to both rulesets
-      as required checks
+- [ ] **Decide how to protect `Pravely`, which cannot use rulesets on this
+      plan.** `protect-main` and `preview-flow` exist and are `active` on
+      `pravely.com`, which is public, and rulesets are free on public repos.
+      `Pravely` is private, and its rulesets endpoint returns
+      *"Upgrade to GitHub Pro or make this repository public to enable this
+      feature."* That is a billing limit, not a missing setting, so there is
+      no ruleset to go and create there.
+
+      Whether `Pravely` has classic branch protection cannot be read from
+      here: that endpoint returns *"Resource not accessible by integration"*,
+      meaning the Claude GitHub App lacks the admin permission, not that
+      protection is absent. Check it by eye at
+      https://github.com/itbb-creator/Pravely/settings/branches
+
+      Three honest options, in order of cost:
+
+      1. **GitHub Pro**, a few dollars a month, unlocks rulesets on private
+         repos and makes Parts 4 and 5 apply as written.
+      2. **Accept the gap with the control that already exists.** The `verify`
+         workflow runs on pushes to `main`, so a bad direct push is caught
+         after the fact rather than blocked. Weaker, but not nothing.
+      3. **Grant the Claude app admin permission** if you want this checked
+         from here rather than by eye in future.
+
+      Do not treat this row as done until one of those is chosen.
+- [ ] Add the Netlify status check and the `verify` workflow as required
+      checks on the `pravely.com` rulesets
 - [ ] Archive `Pravely-App`, and confirm the grant covers `pravely.com` and
       `Pravely` only
 - [ ] Delete the merged `claude/*` branches in both repos. Never touch

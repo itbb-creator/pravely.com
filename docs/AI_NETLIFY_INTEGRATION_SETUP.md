@@ -832,49 +832,66 @@ commits back. Use `git merge-base` rather than inferring divergence from a list.
 
 ## Setup checklist
 
-Part 0, urgent:
+Last reconciled against the live repositories on 17 September 2026. Items are
+ticked only where the evidence is named. A stale security checklist is worse
+than no checklist, because it reports work that was never done as finished.
 
-- [ ] Check whether the app site published `main` today, after 17:59 UTC
-- [ ] Check whether production is running the always-pass test captcha key
-- [ ] Check whether production points at the `security-preview` Supabase branch
-- [ ] Roll back the live site if either is true
+### Done, with the evidence
 
-GitHub:
-
-- [ ] Confirm Claude's grant covers `pravely.com` and `Pravely`, and not `Pravely-App`
-- [ ] Archive `Pravely-App`
-- [ ] Decide what to do about the public security documents
-- [ ] Create `preview` in both repos
-- [ ] Delete the fifteen stale branches, close pull requests #6, #7, #8
-- [ ] Create the `protect-main` ruleset in both repos, one required approval, empty bypass list
-- [ ] Create the `preview-flow` ruleset in both repos, zero required approvals
-- [ ] Add the Netlify status check to both rulesets once it appears
-
-Netlify:
-
-- [ ] Production branch is `main` on both sites
-- [ ] Branch deploys limited to `preview` only
-- [ ] Deploy previews enabled
-- [ ] Stop auto-publishing on production while the release is pending
-- [ ] Preview password or team-login protection on the app site
-- [ ] Turnstile, Supabase, and Stripe values split by deploy context
-
-Cloudflare and Supabase:
-
-- [ ] Create the real `Pravely authentication` Managed widget with the hostname allowlist
-- [ ] Real secret into production Supabase Auth, test secret into the preview branch
-- [ ] Enable leaked-password protection, still open from September 9
-
-Then:
-
-- [ ] Add `CLAUDE.md` to both repos
-- [ ] Optionally connect the Netlify MCP server from the local CLI
-
-Pravely Books, see Part 14:
-
+- [x] `preview` exists in both repos, and `CLAUDE.md` is in both
+- [x] Branch protection on `pravely.com` — the API reports `main` and
+      `preview` as `protected: true`
+- [x] The real `Pravely authentication` Turnstile widget exists and is in use.
+      Its production site key is the compiled fallback in
+      `client/src/components/Turnstile.tsx`, and a live sign-in at
+      `books.pravely.com` was accepted, which only happens when Cloudflare
+      issues a token for that hostname and Supabase verifies it
 - [x] Books site building `npm run build:books` into `dist-books`
 - [x] `books.pravely.com` resolving, sign-in and ledger confirmed working
 - [x] Turnstile hostname confirmed covered by the `pravely.com` entry
-- [x] Merge `main` → `preview` with the accounting nav conflict resolved (`Pravely` #5)
-- [ ] Merge `preview` → `main` so production stops shipping accounting to customers
-- [ ] Repoint the books site from `preview` to `main`
+- [x] `main` → `preview` merged with the accounting nav conflict resolved
+      (`Pravely` #5)
+- [x] `preview` → `main` merged (`Pravely` #10, tip `2a10ed6`), so the
+      accounting module is out of the customer app on `main`. Verified on that
+      tree: `check`, `build` and `build:books` pass, and `dist/public` carries
+      no `business_*` reference
+- [x] Books site repointed from `preview` to `main`, deploy confirmed at
+      `2a10ed6`
+
+### Open, and verifiable from the repos
+
+- [ ] **Branch protection is missing on the `Pravely` repo.** The API reports
+      `main` and `preview` as `protected: false`, while `pravely.com` has both
+      protected. This is the wrong way round: `Pravely` is the repo holding
+      authentication, billing and the customer database, and its production
+      branch currently accepts a direct push. Create the `protect-main` and
+      `preview-flow` rulesets there per Parts 4 and 5
+- [ ] Add the Netlify status check and the `verify` workflow to both rulesets
+      as required checks
+- [ ] Archive `Pravely-App`, and confirm the grant covers `pravely.com` and
+      `Pravely` only
+- [ ] Delete the merged `claude/*` branches in both repos. Never touch
+      `codex/*` or `archive/*`
+- [ ] Decide what to do about the public security documents
+
+### Open, and only checkable in a dashboard
+
+Nothing in the repository can confirm or deny these. Each needs someone signed
+in to look.
+
+- [ ] Confirm the production deploy of `main` actually published, and that the
+      live `app.pravely.com` bundle carries no `business_*` reference
+- [ ] Confirm production is not running the always-pass test captcha key
+      `1x00000000000000000000AA`
+- [ ] Confirm production is not pointing at the `security-preview` Supabase
+      branch
+- [ ] Turnstile, Supabase and Stripe values split by deploy context. Note the
+      compiled production fallbacks described in 14.2: an unset variable in a
+      preview context silently yields the *production* value, so preview
+      contexts must set theirs explicitly
+- [ ] Branch deploys limited to `preview` only; deploy previews enabled
+- [ ] Preview password or team-login protection on the app site
+- [ ] Real Turnstile secret in production Supabase Auth, test secret on the
+      preview branch
+- [ ] Enable leaked-password protection, still open from 9 September
+- [ ] Optionally connect the Netlify MCP server from the local CLI

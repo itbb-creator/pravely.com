@@ -839,9 +839,28 @@ than no checklist, because it reports work that was never done as finished.
 ### Done, with the evidence
 
 - [x] `preview` exists in both repos, and `CLAUDE.md` is in both
-- [x] Branch protection on `pravely.com` — `protect-main` and `preview-flow`
-      both exist with `enforcement: active`, and the API reports `main` and
-      `preview` as `protected: true`
+- [x] Branch protection on **both** repos. `protect-main` and `preview-flow`
+      are `active` in each, with empty bypass lists, force-push blocked, and
+      `main` requiring a reviewed pull request. `Pravely`'s were created on
+      15 September and were correct all along — the pre-Pro `403` on its
+      rulesets endpoint hid them from the API, and an earlier version of this
+      document read that silence as absence. GitHub Pro bought visibility,
+      not protection
+- [x] Archive `Pravely-App`. Archived, and referenced by nothing: no Netlify
+      site builds from it (all three build from `Pravely` or `pravely.com`),
+      and neither repo references it outside `pravely-app-icon.png` and the
+      paragraphs in these docs
+- [x] Leaked-password protection enabled. The Supabase linter reports it only
+      when it is off, and it is absent from the advisor output
+- [x] Deploy previews isolated from production captcha.
+      `VITE_TURNSTILE_SITE_KEY` is set to Cloudflare's test key on
+      `deploy-preview` and `branch-deploy` only; production sets no value and
+      so resolves to the compiled production key. Note that the Netlify MCP
+      returns `"Environment variable upserted"` even when the write silently
+      does nothing — passing `newVarScopes` triggers this. Always read the
+      variables back rather than trusting the success string
+- [x] App site previews closed to the public. `pravelyapp` now requires team
+      login on non-production, matching the other two sites
 - [x] The real `Pravely authentication` Turnstile widget exists and is in use.
       Its production site key is the compiled fallback in
       `client/src/components/Turnstile.tsx`, and a live sign-in at
@@ -861,33 +880,22 @@ than no checklist, because it reports work that was never done as finished.
 
 ### Open, and verifiable from the repos
 
-- [ ] **Decide how to protect `Pravely`, which cannot use rulesets on this
-      plan.** `protect-main` and `preview-flow` exist and are `active` on
-      `pravely.com`, which is public, and rulesets are free on public repos.
-      `Pravely` is private, and its rulesets endpoint returns
-      *"Upgrade to GitHub Pro or make this repository public to enable this
-      feature."* That is a billing limit, not a missing setting, so there is
-      no ruleset to go and create there.
+- [ ] **Make `verify` a required status check on both `Pravely` rulesets.**
+      Both rulesets require a pull request but neither requires a passing
+      build, so a red `verify` can still be merged. That makes the customer
+      bundle check in 14.5 advisory rather than binding, which is the one
+      thing it exists to prevent.
 
-      Whether `Pravely` has classic branch protection cannot be read from
-      here: that endpoint returns *"Resource not accessible by integration"*,
-      meaning the Claude GitHub App lacks the admin permission, not that
-      protection is absent. Check it by eye at
-      https://github.com/itbb-creator/Pravely/settings/branches
+      This cannot be done from a Claude session: `PUT` to the rulesets API
+      returns *"Write access to this GitHub API path is not permitted through
+      this proxy"*, whatever the plan. Do it by hand at
+      https://github.com/itbb-creator/Pravely/settings/rules — for each of
+      `protect-main` and `preview-flow`, tick **Require status checks to
+      pass** and add `verify`.
 
-      Three honest options, in order of cost:
-
-      1. **GitHub Pro**, a few dollars a month, unlocks rulesets on private
-         repos and makes Parts 4 and 5 apply as written.
-      2. **Accept the gap with the control that already exists.** The `verify`
-         workflow runs on pushes to `main`, so a bad direct push is caught
-         after the fact rather than blocked. Weaker, but not nothing.
-      3. **Grant the Claude app admin permission** if you want this checked
-         from here rather than by eye in future.
-
-      Do not treat this row as done until one of those is chosen.
-- [ ] Add the Netlify status check and the `verify` workflow as required
-      checks on the `pravely.com` rulesets
+      Add only `verify`. The Netlify checks report `neutral` on deploys that
+      change no pages, which would block merges for no reason.
+- [ ] Consider the same on the `pravely.com` rulesets
 - [ ] Archive `Pravely-App`, and confirm the grant covers `pravely.com` and
       `Pravely` only
 - [ ] Delete the merged `claude/*` branches in both repos. Never touch

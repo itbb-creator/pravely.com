@@ -17,10 +17,16 @@ OpenAI API key with funded usage is stored as an Edge Function secret.
    `OPENAI_API_KEY` remains a fallback during migration only.
 4. Optionally add `OPENAI_HEALTH_MODEL`. If omitted, Pravely uses
    `gpt-5.4-mini`.
-5. Add `HEALTH_COACH_HOURLY_LIMIT`. Every submitted request reserves one unit
-   before calling OpenAI. The default is 20 per user per hour, bounded to
-   1–100. For the first launch, use a deliberately lower value such as `5` or
-   `10`, publish that allowance in the plan wording, and raise it only from
+5. Add `HEALTH_COACH_HOURLY_LIMIT` and `HEALTH_COACH_MONTHLY_LIMIT`. The
+   hourly cap bounds how fast one account can spend; the monthly cap bounds
+   what a one-time purchase can be made to cost over its life, and is the one
+   that protects the margin. Recommended: `10` hourly and `100` monthly, which
+   is far above real use and holds the worst case near $4.40 per customer per
+   year. Defaults if unset are the same values. Both are clamped server-side
+   (hourly to 100, monthly to 1000) so a mistyped secret cannot remove the cap.
+   Every submitted request reserves one unit in both windows
+   before calling OpenAI. For the first launch, publish the allowance in the
+   plan wording, and raise it only from
    measured usage and support evidence.
 6. Set `HEALTH_COACH_ENABLED=false` to disable provider calls immediately
    without an emergency application release.

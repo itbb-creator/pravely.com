@@ -78,17 +78,32 @@ Deno.serve(async (req: Request) => {
       if (!hasHealthCoachAccess(entitlement, false)) return jsonResponse({ error: 'AI coaching requires active Complete access.' }, 403, req);
     }
 
-    const configuredLimit = Number(envGet('HEALTH_COACH_HOURLY_LIMIT', '20'));
-    const hourlyLimit = Math.max(1, Math.min(Number.isFinite(configuredLimit) ? configuredLimit : 20, 100));
+    // Two caps, checked together in one call. The hourly cap bounds how fast a
+    // customer can spend; the monthly cap is what bounds what a one-time
+    // purchase can be made to cost over its life.
+    const configuredLimit = Number(envGet('HEALTH_COACH_HOURLY_LIMIT', '10'));
+    const hourlyLimit = Math.max(1, Math.min(Number.isFinite(configuredLimit) ? configuredLimit : 10, 100));
+    const configuredMonthly = Number(envGet('HEALTH_COACH_MONTHLY_LIMIT', '100'));
+    const monthlyLimit = Math.max(1, Math.min(Number.isFinite(configuredMonthly) ? configuredMonthly : 100, 1000));
     const { data: allowed, error: quotaError } = await sb.rpc('consume_health_coach_quota', {
       p_user_id: data.user.id,
       p_limit: hourlyLimit,
+      p_monthly_limit: monthlyLimit,
     });
     if (quotaError) {
       await notifyFounder(sb, 'configuration_failure', 'The Health Coach quota check failed.');
       return jsonResponse({ error: 'AI coaching is temporarily unavailable.' }, 503, req);
     }
-    if (!allowed) return jsonResponse({ error: 'You have reached the hourly coaching limit. Please try again later.' }, 429, req);
+    // The database refuses without saying which cap was reached; the message
+    // stays true for either and never implies the customer can simply wait an
+    // hour when it is the month that is spent.
+    if (!allowed) {
+      return jsonResponse(
+        { error: 'You have reached your coaching limit for now. Please try again later.' },
+        429,
+        req,
+      );
+    }
 
     const response = await fetch('https://api.openai.com/v1/responses', {
       method: 'POST',

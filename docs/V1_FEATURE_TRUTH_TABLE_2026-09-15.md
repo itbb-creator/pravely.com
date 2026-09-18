@@ -9,7 +9,8 @@ This is the single review sheet for what Pravely sells, where each feature works
 | Feature | Free 7-day trial | Plus | Complete | Web | PWA | iOS | Android | Implemented | Verified | Customer support owner | Customer-facing wording |
 |---|---:|---:|---:|---:|---:|---:|---:|---|---|---|---|
 | Complete trial access | ✓ | — | — | ✓ | ✓ | Later | Later | Yes | Preview trial/Plus/Complete/expired gates passed | Founder | “Try the Complete experience for seven days. Purchase is required afterward.” |
-| Expired-trial paywall | ✓ | — | — | ✓ | ✓ | Later | Later | Yes | Preview database access gate and browser wall passed | Founder | “When your trial ends, the financial workspace is locked until you purchase.” |
+| Expired-trial paywall | ✓ | — | — | ✓ | ✓ | Later | Later | Yes | Preview database access gate and browser wall passed | Founder | “Editing locks when your trial ends. You can still read your plan and download a copy.” |
+| Read and export your data after expiry | ✓ | ✓ | ✓ | ✓ | ✓ | Later | Later | Yes | Database policy and browser download verified; customer-facing wording pending founder approval | Founder | “After your trial ends you can still read what you saved and download it as a spreadsheet or a complete file.” |
 | Delete financial data after expiry | ✓ | ✓ | ✓ | ✓ | ✓ | Later | Later | Yes | Preview expired-account deletion passed | Founder | “You can permanently delete your financial data without reopening the app.” |
 | Delete account after expiry | ✓ | ✓ | ✓ | ✓ | ✓ | Later | Later | Yes | Preview expired-account deletion passed | Founder | “You can permanently delete your account and data from the locked screen.” |
 | Account authentication, recovery, and optional MFA | ✓ | ✓ | ✓ | ✓ | ✓ | Later | Later | Yes | Prior security preview; production email tests pending | Founder | “Secure account access with email verification, recovery, and optional MFA.” |

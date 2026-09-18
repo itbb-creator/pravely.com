@@ -43,7 +43,7 @@ functions, and `download.html` is served by Netlify like any other page.
 | `supabase/functions/get-download/` | Fresh signed URLs for download.html |
 | `supabase/functions/preview-email/` | Admin view of the stored welcome email |
 | `supabase/functions/_shared/` | License gen, personalization, email, config, audit |
-| `supabase/migrations/…licensing.sql` | Tables + private buckets + RLS |
+| `supabase/migrations/…licensing.sql` (Pravely app repository) | Tables + private buckets + RLS |
 | `assets/masters/*.xlsx` | Master workbooks (placeholders — swap in yours) |
 | `scripts/seed-masters.mjs` | Upload masters to Supabase |
 | `scripts/simulate-purchase.mjs` | Test the whole pipeline without Stripe |
@@ -55,7 +55,8 @@ functions, and `download.html` is served by Netlify like any other page.
 
 1. [supabase.com](https://supabase.com) → New project (free tier is plenty).
 2. SQL Editor → paste the contents of
-   `supabase/migrations/20260814000000_licensing.sql` → Run.
+   `supabase/migrations/20260814000000_licensing.sql` from the Pravely app
+   repository, which holds every database migration → Run.
    This creates `licenses`, `license_events`, `stripe_events`, the two
    private storage buckets, and locks them to the service role.
 

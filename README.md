@@ -1,6 +1,8 @@
 # pravely.com — Editable Site + Marketing Hooks
 
-> **Repository scope:** the current marketing site plus companion workbook-delivery infrastructure. The responsive application is maintained separately in the Pravely app repository; workbook scripts do not define the paid web-app catalog.
+> **Repository scope:** the marketing site plus the workbook-delivery edge functions and their tooling.
+>
+> **The database lives in the Pravely app repository.** Every migration, the schema verification queries, the Supabase config and the auth email templates moved there on 2026-09-18, so one repository describes the backend. Do not add a migration here.
 
 This repo is now your **editable source of truth** for pravely.com. No more hunting through hosting dashboards.
 
@@ -44,7 +46,7 @@ npm run simulate -- --product premium --name "Test Buyer" --email test@example.c
 ```
 
 Quick checklist when you're ready to go live:
-1. Run `supabase/migrations/20260814000000_licensing.sql` in Supabase SQL Editor
+1. Run `supabase/migrations/20260814000000_licensing.sql` from the **Pravely app repository** in the Supabase SQL Editor. Database migrations live there, not here.
 2. Create your Stripe products/prices → deploy functions + secrets (guide has commands)
 3. Drop your real master into `assets/masters/` → `npm run seed`
 4. Set `functionsBaseUrl` in `content.json` → commit

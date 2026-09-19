@@ -1,5 +1,7 @@
 # Pravely pre-launch master plan
 
+> **HISTORICAL MIRROR — DO NOT USE AS THE ACTIVE CHECKLIST.** The continuously updated launch checklist lives in the private Pravely app repository. This copy predates the approved PWA launch scope and September 19 product catalog ($69/$139 founding; $89/$169 regular; $90 upgrade).
+
 Date: September 15, 2026  
 Recommended launch shape: web-first, limited cohort, then native apps  
 Purpose: one ordered list of the work still required to turn the current product into a dependable launch, followed by the business systems to add after the product is stable.

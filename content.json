@@ -14,21 +14,25 @@
     },
     "plus": {
       "name": "Pravely Plus",
-      "price": "$89",
-      "blurb": "One-time purchase"
+      "price": "$69",
+      "regularPrice": "$89",
+      "blurb": "Founding-offer one-time purchase"
     },
     "complete": {
       "name": "Pravely Complete",
-      "price": "$159",
-      "blurb": "One-time purchase"
+      "price": "$139",
+      "regularPrice": "$169",
+      "blurb": "Founding-offer one-time purchase"
     },
     "upgrade": {
       "name": "Plus to Complete upgrade",
-      "price": "$70",
+      "price": "$90",
       "blurb": "One-time purchase"
     }
   },
   "socialLinks": {
-    "facebook": "https://www.facebook.com/profile.php?id=61593162213256"
+    "facebook": "https://www.facebook.com/profile.php?id=61593162213256",
+    "instagram": "https://www.instagram.com/pravelyofficial/",
+    "tiktok": "https://www.tiktok.com/@pravelyus"
   }
 }

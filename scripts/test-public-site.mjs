@@ -20,6 +20,13 @@ assert.doesNotMatch(text, /"instagram"\s*:\s*"#"/i);
 assert.doesNotMatch(text, /"tiktok"\s*:\s*"#"/i);
 assert.match(text, /Feature availability/i);
 assert.match(text, /facebook\.com\/profile\.php\?id=61593162213256/i);
+assert.match(text, /instagram\.com\/pravelyofficial/i);
+assert.match(text, /tiktok\.com\/@pravelyus/i);
+assert.match(text, /\$69 founding price/i);
+assert.match(text, /\$139 founding price/i);
+assert.match(text, /normally \$169/i);
+assert.match(text, /\$90 one time/i);
+assert.doesNotMatch(text, /\$159\b|\$70\b/i);
 assert.doesNotMatch(featurePage, /Pravely (?:internal|business) accounting/i);
 
 for (const privatePath of [

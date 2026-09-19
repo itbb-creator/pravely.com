@@ -1,5 +1,7 @@
 # Web v1 fixes and AI integration test report
 
+> **HISTORICAL SNAPSHOT.** This report predates the September 19 decision to include the installable PWA at launch. Use the private app repository's active pre-launch master plan and the current public feature table for launch scope.
+
 Date: 2026-09-15  
 Status: isolated hosted preview validated; production promotion still pending
 

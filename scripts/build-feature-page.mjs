@@ -66,14 +66,14 @@ const html = `<!doctype html>
   <main id="main">
     <section class="hero"><div class="wrap"><div class="eyebrow">Living product guide · Updated September 2026</div><h1>What you get now—and what comes later.</h1><p>This table is Pravely’s public source of truth for plan access, platforms, implementation, verification, and customer wording. “Later” and “planned” features are roadmap items, not promises that they are available today.</p><div class="legend" aria-label="Status legend"><span class="status included">✓ Included now</span><span class="status future">Later or planned</span><span class="status none">— Not included</span></div></div></section>
     <section class="content"><div class="wrap">
-      <div class="intro"><div class="card"><h2>Web first</h2><p>The responsive web app is the first release. PWA certification and dedicated iOS and Android packages follow only after their own purchasing, restoration, signing, and physical-device testing.</p></div><div class="card"><h2>Seven-day trial</h2><p>The trial provides Complete access for seven days. After expiry, the editable workspace locks; the paywall still lets customers review or export their saved information, purchase access, sign out, or delete their data and account.</p></div></div>
+      <div class="intro"><div class="card"><h2>Web and installable PWA</h2><p>The responsive web app and installable PWA are the first release. Dedicated iOS and Android packages follow only after their own purchasing, restoration, signing, and physical-device testing.</p></div><div class="card"><h2>Seven-day trial</h2><p>The trial provides Complete access for seven days. After expiry, the editable workspace locks; the paywall still lets customers review or export their saved information, purchase access, sign out, or delete their data and account.</p></div></div>
       <div class="table-shell" tabindex="0" role="region" aria-label="Scrollable Pravely feature availability table">
         <table><caption>${rows.length} product capabilities and roadmap items</caption><thead><tr>${headers.map((header) => `<th scope="col">${escapeHtml(header)}</th>`).join('')}</tr></thead><tbody>${bodyRows}</tbody></table>
       </div>
       <p class="note">Verification describes completed evidence, not a guarantee of uninterrupted operation. The founder is the current support owner and the only person authorized to change plan inclusion or promote a roadmap feature into the launch product.</p>
     </div></section>
   </main>
-  <footer><div class="wrap footer"><img src="./images/pravely-logo-horizontal.png" alt="Pravely"><div class="footer-links"><a href="./">Home</a><a href="./changelog.html">Changelog</a><a href="./contact.html">Contact</a><a href="./terms.html">Terms</a><a href="./privacy.html">Privacy</a></div></div></footer>
+  <footer><div class="wrap footer"><img src="./images/pravely-logo-horizontal.png" alt="Pravely"><div class="footer-links"><a href="./">Home</a><a href="./changelog.html">Changelog</a><a href="https://www.instagram.com/pravelyofficial/" target="_blank" rel="noopener noreferrer">Instagram</a><a href="https://www.tiktok.com/@pravelyus" target="_blank" rel="noopener noreferrer">TikTok</a><a href="./contact.html">Contact</a><a href="./terms.html">Terms</a><a href="./privacy.html">Privacy</a></div></div></footer>
 </body>
 </html>
 `;

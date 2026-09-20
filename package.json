@@ -9,7 +9,9 @@
     "seed": "node scripts/seed-masters.mjs",
     "simulate": "node --experimental-strip-types scripts/simulate-purchase.mjs",
     "email-release": "node --experimental-strip-types scripts/send-release-update.mjs",
-    "test": "node --experimental-strip-types scripts/test-personalize.mjs"
+    "test": "npm run test:personalize && npm run test:pricing",
+    "test:personalize": "node --experimental-strip-types scripts/test-personalize.mjs",
+    "test:pricing": "node --experimental-strip-types scripts/test-pricing.mjs"
   },
   "engines": {
     "node": ">=20"

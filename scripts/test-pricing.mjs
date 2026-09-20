@@ -18,7 +18,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { PRODUCT_CATALOG, dollars } from '../shared/product-catalog.ts';
+import { PRODUCT_CATALOG, dollars, offerPrices } from '../shared/product-catalog.ts';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -108,6 +108,41 @@ if (section) {
     check(marked, `${regular} is shown as the price ${founding} saves against`);
   }
 }
+
+console.log('\nThe page can switch itself to the regular offer');
+
+// The founding offer ends on its own, and the page swaps its prices when it
+// does. These check the machinery that swap depends on, because a renamed hook
+// would fail silently: the page would simply keep advertising $69.
+const regular = offerPrices('regular');
+check(
+  regular.plus.amountCents === founding.plus.regularAmountCents,
+  'the regular Plus price matches what the founding offer compares against',
+);
+check(
+  regular.complete.amountCents === founding.complete.regularAmountCents,
+  'the regular Complete price matches what the founding offer compares against',
+);
+check(
+  regular.completeUpgrade.amountCents === founding.completeUpgrade.amountCents,
+  'the upgrade price does not move when the offer ends',
+);
+check(
+  regular.plus.regularAmountCents === undefined,
+  'the regular offer has nothing to strike through',
+);
+
+for (const hook of ['data-price="plus"', 'data-price="complete"', 'data-founding-block', 'data-pricing-kicker']) {
+  check(html.includes(hook), `index.html carries the ${hook} hook the swap needs`);
+}
+check(
+  html.includes('/current-offer'),
+  'index.html asks the server which offer is in force',
+);
+check(
+  content.foundingOffer && 'closesAt' in content.foundingOffer,
+  'content.json carries the deadline the page falls back to when the server is unreachable',
+);
 
 console.log(`\n${failures === 0 ? 'Pricing matches the approved catalog.' : `${failures} pricing check(s) failed.`}`);
 process.exit(failures === 0 ? 0 : 1);

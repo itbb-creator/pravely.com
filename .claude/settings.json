@@ -1,6 +1,6 @@
 {
   "permissions": {
-    "defaultMode": "dontAsk",
+    "defaultMode": "plan",
     "allow": [
       "mcp__github__get_file_contents",
       "mcp__github__pull_request_read",

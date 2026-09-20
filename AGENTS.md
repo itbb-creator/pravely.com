@@ -76,6 +76,21 @@ captcha change, confirm in a browser that the widget actually renders.
 Note that `netlify.toml` redirects `/account.html` to app.pravely.com, so
 this page is not the signup form real users reach.
 
+## Show the plan first, then finish the work
+
+The owner's standing instruction, given 20 September 2026: before acting on
+anything beyond a one-step answer, say what you understood the request to be
+and what you intend to do about it, and let them correct it.
+
+This is not the same as asking permission, and it does not soften the section
+below. The plan is one message at the start, not a checkpoint before every
+step. Once it is approved, carry out the whole thing without stopping — and
+if the work turns out differently than planned, say so in the result rather
+than pausing to re-plan.
+
+`.claude/settings.json` sets `permissions.defaultMode` to `plan` so this
+happens by default rather than by memory.
+
 ## Finish the work before handing it back
 
 The owner's standing instruction, given 16 September 2026: complete

@@ -3,12 +3,29 @@
 This file is the single source of truth for every AI assistant working in
 this repository, Codex and Claude alike. `CLAUDE.md` points here.
 
-This is the Pravely marketing site. It is static, with no build step, and
-deploys to the Netlify site `timely-palmier-9a6a82`, which serves
-pravely.com.
+This is the Pravely marketing site. It deploys to the Netlify site
+`timely-palmier-9a6a82`, which serves pravely.com.
 
 The app itself lives in the separate private repo `itbb-creator/Pravely`.
 Captcha, login, signup, and Supabase auth work belongs there, not here.
+
+## There is no backend in this repository
+
+Every database migration and every edge function lives in the app repo and
+deploys from there. Do not add a `supabase/` directory here, and do not run
+`supabase functions deploy` or `supabase db push` from this checkout. CI fails
+the build if `supabase/` reappears.
+
+This is not a style rule. Until 20 September 2026 this repository carried a
+full copy of the backend, ten days stale: a `create-app-checkout` with no price
+validation, no automatic tax and promotion codes enabled, and a complete set of
+migrations. One deploy from the wrong directory would have replaced the
+hardened production functions with it.
+
+The workbook personalization library the site's own tooling uses — license
+generation, `personalizeWorkbook`, the welcome-email builder, the product
+catalogue — now lives in `lib/shared/`, outside any path the Supabase CLI
+recognises.
 
 ## Branches
 

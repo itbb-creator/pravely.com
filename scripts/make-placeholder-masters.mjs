@@ -11,14 +11,14 @@
  *   verify the personalization preserves defined names.
  *
  * When your real workbook is finished, save it over these files (or add your
- * own paths in supabase/functions/_shared/config.ts) and run `npm run seed`.
+ * own paths in lib/shared/config.ts) and run `npm run seed`.
  * Everything else — formatting, charts, formulas — is preserved by the
  * pipeline because it only edits the two placeholder strings.
  *
  * Usage: npm run masters
  */
 
-import { zipSync, strToU8 } from '../supabase/functions/_shared/vendor/fflate.mjs';
+import { zipSync, strToU8 } from '../lib/shared/vendor/fflate.mjs';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';

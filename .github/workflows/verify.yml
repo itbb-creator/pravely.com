@@ -35,6 +35,18 @@ jobs:
         run: npm run masters
       - run: npm run test:personalize
       - run: npm run test:public-site
-      - run: npm run test:release-hardening
-      - run: npm run test:health-coach
+      - run: npm run test:feature-page
       - run: npm run test:repository-core
+      # The backend lives in the Pravely app repository and deploys from there.
+      # This repository must not grow a supabase/ directory again: a stale copy
+      # here is one `supabase functions deploy` from replacing the hardened
+      # production functions, and one `supabase db push` from replaying old
+      # migrations.
+      - name: No backend in the public repository
+        shell: bash
+        run: |
+          if [ -e supabase ]; then
+            echo 'supabase/ is back in the marketing repository.'
+            echo 'Migrations and edge functions belong in the Pravely app repo.'
+            exit 1
+          fi

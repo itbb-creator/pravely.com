@@ -6,7 +6,7 @@
  * EMAIL_FROM. Optional: SITE_URL, SUPPORT_EMAIL.
  * Usage: npm run email-release -- premium 1.1.0 [--send]
  */
-import { buildReleaseUpdateEmail } from '../supabase/functions/_shared/email.ts';
+import { buildReleaseUpdateEmail } from '../lib/shared/email.ts';
 
 const [product, version] = process.argv.slice(2).filter((arg) => arg !== '--send');
 const send = process.argv.includes('--send');

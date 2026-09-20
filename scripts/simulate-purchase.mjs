@@ -18,10 +18,10 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { generateLicenseId } from '../supabase/functions/_shared/license.ts';
-import { personalizeWorkbook } from '../supabase/functions/_shared/personalize.ts';
-import { buildWelcomeEmail } from '../supabase/functions/_shared/email.ts';
-import { PRODUCTS, getProduct, envGet } from '../supabase/functions/_shared/config.ts';
+import { generateLicenseId } from '../lib/shared/license.ts';
+import { personalizeWorkbook } from '../lib/shared/personalize.ts';
+import { buildWelcomeEmail } from '../lib/shared/email.ts';
+import { PRODUCTS, getProduct, envGet } from '../lib/shared/config.ts';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 

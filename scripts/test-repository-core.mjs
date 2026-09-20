@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 
-import { buildWelcomeEmail } from '../supabase/functions/_shared/email.ts';
-import { generateLicenseId, isLicenseId } from '../supabase/functions/_shared/license.ts';
+import { buildWelcomeEmail } from '../lib/shared/email.ts';
+import { generateLicenseId, isLicenseId } from '../lib/shared/license.ts';
 
 assert.equal(isLicenseId('PRV-7K4X9P2M'), true);
 assert.equal(isLicenseId('ITB-7K4X9P2M'), true);

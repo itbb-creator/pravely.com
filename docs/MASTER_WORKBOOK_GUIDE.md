@@ -74,7 +74,7 @@ in Excel to see them in context (the License sheet doubles as a reference).
 
 ## Naming & paths (if you want different ones)
 
-`supabase/functions/_shared/config.ts` maps each product to its master path
+`lib/shared/config.ts` maps each product to its master path
 and output filename prefix:
 
 ```ts

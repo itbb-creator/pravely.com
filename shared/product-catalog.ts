@@ -57,7 +57,30 @@ export const PRODUCT_CATALOG = {
   },
 } as const;
 
-export const ACTIVE_PRICES = PRODUCT_CATALOG.foundingOffer;
+export type OfferName = "founding" | "regular";
+
+export type OfferPrices = {
+  plus: { amountCents: number; regularAmountCents?: number };
+  complete: { amountCents: number; regularAmountCents?: number };
+  completeUpgrade: { amountCents: number };
+};
+
+/**
+ * The prices in force for a given offer.
+ *
+ * This replaced `ACTIVE_PRICES`, which was a constant alias for the founding
+ * offer. A constant was the whole problem: on the day the window closed,
+ * nothing would have changed what customers were charged until someone edited
+ * this file and redeployed. The offer now has an end, so the prices need a
+ * function.
+ *
+ * `regularAmountCents` is absent on the regular offer rather than equal to
+ * `amountCents`. That is what makes the struck-through "normally $89" line
+ * disappear by itself instead of rendering "$89 · normally $89".
+ */
+export function offerPrices(offer: OfferName): OfferPrices {
+  return offer === "founding" ? PRODUCT_CATALOG.foundingOffer : PRODUCT_CATALOG.regularOffer;
+}
 
 export function dollars(amountCents: number) {
   return amountCents / 100;
@@ -120,4 +143,18 @@ export function foundingOfferStatus(input?: {
     return { open: false, reason: "window_closed", closesAt, seatsTaken, seatsRemaining };
   }
   return { open: true, reason: "open", closesAt, seatsTaken, seatsRemaining };
+}
+
+/**
+ * Which offer a purchase made right now is priced at.
+ *
+ * One function, so the checkout, the app and the marketing site cannot reach
+ * three different answers from the same inputs.
+ */
+export function currentOffer(input?: {
+  now?: Date;
+  seatsTaken?: number;
+  launchDate?: string | null;
+}): OfferName {
+  return foundingOfferStatus(input).open ? "founding" : "regular";
 }

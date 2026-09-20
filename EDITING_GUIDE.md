@@ -1,5 +1,7 @@
 # How to edit pravely.com — the easiest way
 
+> **Current-site and companion-workbook guide.** Validate plan, trial, and feature wording against `docs/V1_FEATURE_TRUTH_TABLE_2026-09-15.md`; older workbook offers are historical.
+
 You have 3 options, from easiest (no code) to most powerful. Pick one.
 
 ---

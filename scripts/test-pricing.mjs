@@ -78,7 +78,9 @@ if (section) {
     check(pricing.includes(value), `${name} (${value}) appears in the pricing section`);
   }
 
-  const approved = new Set(Object.values(expected));
+  // "$0 to start" is the trial card, not a price in the catalog. It is the
+  // one amount allowed through that the catalog does not name.
+  const approved = new Set([...Object.values(expected), '$0']);
   // A comma only counts as a thousands separator. Matching [0-9,]* instead
   // swallows the comma in "instead of $89, and" and reports "$89," as an
   // unapproved amount.
@@ -91,13 +93,19 @@ if (section) {
       : `unapproved amounts in the pricing section: ${unapproved.join(', ')}`,
   );
 
-  // Both prices are shown so a buyer can see the saving. If the regular price
-  // stops being struck through it reads as a second price, not a comparison.
-  for (const regular of [expected.plusRegular, expected.completeRegular]) {
-    check(
-      new RegExp(`<s>\\${regular}</s>`).test(pricing),
-      `${regular} is struck through, so it reads as the price being saved against`,
-    );
+  // Both prices are shown so a buyer can see the saving. What matters is that
+  // the regular price is marked as the one being saved against — struck
+  // through, or labelled "normally" — and not left to read as a second price
+  // someone might be charged. Either presentation passes; neither passes if
+  // the regular price is just sitting there on its own.
+  const savings = [
+    [expected.plusFounding, expected.plusRegular],
+    [expected.completeFounding, expected.completeRegular],
+  ];
+  for (const [founding, regular] of savings) {
+    const escaped = regular.replace('$', '\\$');
+    const marked = new RegExp(`<s>${escaped}</s>|normally\\s+${escaped}`).test(pricing);
+    check(marked, `${regular} is shown as the price ${founding} saves against`);
   }
 }
 

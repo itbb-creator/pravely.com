@@ -1,5 +1,7 @@
 # Pravely — Founding Offer Social Launch Kit
 
+> **ARCHIVED HISTORICAL COPY — DO NOT PUBLISH OR REUSE.** This kit describes the obsolete paid-workbook offer and does not match the responsive web-app launch or current plan catalog.
+
 ## Offer facts to keep consistent
 
 - Premium Toolkit: $36, one-time purchase; no subscription.

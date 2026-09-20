@@ -1,5 +1,7 @@
 # Licensed Workbook Delivery — Setup Guide
 
+> **Companion workbook delivery only.** This runbook supports the founding-offer/original workbook and is not the responsive web-app launch process or current paid-app catalog.
+
 This is the automated flow: **customer pays → license generated → master Excel
 personalized → private storage → temporary download link → "Your toolkit is
 ready" email.** No accounts, no logins — yet it's the exact plumbing your

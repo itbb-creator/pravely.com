@@ -1,5 +1,7 @@
 # Master Workbook Guide
 
+> **Companion workbook delivery only.** Use this document to maintain the downloadable original workbook; do not use it to define the web-app launch, plans, or paid feature claims.
+
 The pipeline personalizes **your master .xlsx** by replacing placeholder
 strings — nothing else in the file is touched (styling, charts, images,
 formulas, defined names, sheets, everything survives byte-for-byte). So the

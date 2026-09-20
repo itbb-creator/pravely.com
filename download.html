@@ -98,7 +98,7 @@
           <div><span>Product</span><b id="ready-product"></b></div>
           <div><span>File</span><b id="ready-file"></b></div>
         </div>
-        <a class="btn" id="btn-download" href="#" download>
+        <a class="btn" id="btn-download" download aria-disabled="true">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           Download my Pravely toolkit
         </a>
@@ -192,6 +192,7 @@
               $('btn-video').href = './onboarding?plan=' + encodeURIComponent(plan) + '#video-player';
               var btn = $('btn-download');
               btn.href = data.downloadUrl;
+              btn.removeAttribute('aria-disabled');
               btn.setAttribute('download', data.fileName || '');
               // If the download came from a signed URL the browser will save it;
               // keep the button usable for repeat visits too.

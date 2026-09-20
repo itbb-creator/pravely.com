@@ -5,15 +5,21 @@
   "type": "module",
   "description": "Pravely — static site + licensed workbook delivery pipeline (Supabase Edge Functions)",
   "scripts": {
+    "build:features": "node scripts/build-feature-page.mjs",
+    "build:site": "npm run build:features && node scripts/build-public-site.mjs",
     "masters": "node scripts/make-placeholder-masters.mjs",
     "seed": "node scripts/seed-masters.mjs",
     "simulate": "node --experimental-strip-types scripts/simulate-purchase.mjs",
     "email-release": "node --experimental-strip-types scripts/send-release-update.mjs",
     "test": "npm run test:personalize && npm run test:pricing",
     "test:personalize": "node --experimental-strip-types scripts/test-personalize.mjs",
-    "test:pricing": "node --experimental-strip-types scripts/test-pricing.mjs"
+    "test:pricing": "node --experimental-strip-types scripts/test-pricing.mjs",
+    "test:health-coach": "node --experimental-strip-types scripts/test-health-coach.mjs",
+    "test:repository-core": "node --experimental-strip-types scripts/test-repository-core.mjs",
+    "test:release-hardening": "node scripts/test-release-hardening.mjs && node scripts/build-feature-page.mjs --check",
+    "test:public-site": "npm run build:site && node scripts/test-public-site.mjs && node scripts/test-public-links.mjs"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   }
 }

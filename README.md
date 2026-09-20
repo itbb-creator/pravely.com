@@ -1,5 +1,7 @@
 # pravely.com — Editable Site + Marketing Hooks
 
+> **Repository scope:** the current marketing site plus companion workbook-delivery infrastructure. The responsive application is maintained separately in the Pravely app repository; workbook scripts do not define the paid web-app catalog.
+
 This repo is now your **editable source of truth** for pravely.com. No more hunting through hosting dashboards.
 
 ## ⚡ Quick Edit (30 seconds, no code)

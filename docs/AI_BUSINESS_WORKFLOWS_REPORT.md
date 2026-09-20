@@ -1,5 +1,7 @@
 # AI opportunities for Pravely
 
+> **Historical research snapshot.** Do not treat product, offer, tool-connection, or readiness statements in this report as current launch instructions.
+
 Prepared September 7, 2026. Research and implementation recommendations; no automations were enabled, messages sent, or production data changed.
 
 ## What this report is based on

@@ -68,6 +68,45 @@ for (const [name, expected] of Object.entries(EXPECTED_BLANKS)) {
     `${name} has ${expected} unfilled generator blank(s) (found ${found})`);
 }
 
+console.log('\nNo word is glued to the punctuation before it');
+// Read the way a browser renders, not the way the file is written. That
+// distinction is the whole check: an inline tag contributes no space, so
+// `process?</strong>When` renders as "process?When" while every tool that
+// replaced a tag with a space read it as "process? When" and saw nothing wrong.
+// That is how it survived a prose diff, a dictionary scan and a repair pass.
+//
+// &nbsp; is a space, which is what separates the one real defect from the five
+// sibling questions in the same list that were always correct.
+const INLINE_TAGS = /<\/?(?:span|b|i|u|s|em|strong|a|sub|sup|small|font|bdt)(?:\s[^>]*)?>/gi;
+const GLUED = /[a-z][.!?:;,][A-Z][a-z]{2,}/g;
+for (const [name, html] of Object.entries(pages)) {
+  const rendered = html.replace(INLINE_TAGS, '');
+  const glued = [...new Set(rendered.match(GLUED) ?? [])]
+    // &nbsp; ends in "p;", so a capital after it is a space, not a defect.
+    .filter((hit) => !hit.startsWith('p;'));
+  check(
+    glued.length === 0,
+    glued.length === 0
+      ? `${name} has no word glued to the punctuation before it`
+      : `${name} has glued text: ${glued.join(', ')}`,
+  );
+}
+
+console.log('\nThe offer wall stays gone');
+// Termly generated a section describing third-party advertisers paying users in
+// virtual currency, with the user ID shared with the provider. Pravely has no
+// offer wall, so publishing it described data sharing that does not happen. A
+// regenerated document must not quietly bring it back.
+// Comments are not published text, and the note recording the removal names
+// the thing it removed.
+const withoutComments = (html) => html.replace(/<!--[\s\S]*?-->/g, '');
+for (const [name, html] of Object.entries(pages)) {
+  check(
+    !/offer wall/i.test(withoutComments(html)),
+    `${name} does not describe an offer wall`,
+  );
+}
+
 console.log('\nThe workbook licence survived the move out of the terms');
 // Section 7 of the old hand-written terms said this. Neither new document
 // mentions workbooks, and every delivered copy really is stamped with a licence

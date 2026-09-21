@@ -11,9 +11,10 @@
     "seed": "node scripts/seed-masters.mjs",
     "simulate": "node --experimental-strip-types scripts/simulate-purchase.mjs",
     "email-release": "node --experimental-strip-types scripts/send-release-update.mjs",
-    "test": "npm run test:personalize && npm run test:pricing",
+    "test": "npm run test:personalize && npm run test:pricing && npm run test:legal-pages",
     "test:personalize": "node --experimental-strip-types scripts/test-personalize.mjs",
     "test:pricing": "node --experimental-strip-types scripts/test-pricing.mjs",
+    "test:legal-pages": "node scripts/test-legal-pages.mjs",
     "test:repository-core": "node --experimental-strip-types scripts/test-repository-core.mjs",
     "test:feature-page": "node scripts/test-feature-page.mjs",
     "test:public-site": "npm run build:site && node scripts/test-public-site.mjs && node scripts/test-public-links.mjs"

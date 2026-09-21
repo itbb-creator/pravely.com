@@ -44,7 +44,7 @@ npm run simulate -- --product premium --name "Test Buyer" --email test@example.c
 ```
 
 Quick checklist when you're ready to go live:
-1. Run `supabase/migrations/20260814000000_licensing.sql` in Supabase SQL Editor
+1. Run `supabase/migrations/20260814000000_licensing.sql` from the Pravely app repo, in the Supabase SQL Editor
 2. Create your Stripe products/prices → deploy functions + secrets (guide has commands)
 3. Drop your real master into `assets/masters/` → `npm run seed`
 4. Set `functionsBaseUrl` in `content.json` → commit

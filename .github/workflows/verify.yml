@@ -2,8 +2,11 @@ name: Verify marketing and platform release
 
 on:
   pull_request:
+  # preview and claude/** are here for the same reason main and codex/** are:
+  # both assistants push to this repository, and a check that only runs on one
+  # of them is a check that half the work skips.
   push:
-    branches: [main, "codex/**"]
+    branches: [main, preview, "codex/**", "claude/**"]
 
 permissions:
   contents: read
@@ -23,7 +26,27 @@ jobs:
             echo 'A secret-shaped value was found in a tracked file.'
             exit 1
           fi
+      - name: Published prices match the approved catalog
+        run: npm run test:pricing
+      # assets/masters/*.xlsx is gitignored, so a fresh checkout has no
+      # workbooks to personalize. These are the placeholder masters the test
+      # was written against, not the real ones.
+      - name: Build the placeholder masters
+        run: npm run masters
+      - run: npm run test:personalize
       - run: npm run test:public-site
-      - run: npm run test:release-hardening
-      - run: npm run test:health-coach
+      - run: npm run test:feature-page
       - run: npm run test:repository-core
+      # The backend lives in the Pravely app repository and deploys from there.
+      # This repository must not grow a supabase/ directory again: a stale copy
+      # here is one `supabase functions deploy` from replacing the hardened
+      # production functions, and one `supabase db push` from replaying old
+      # migrations.
+      - name: No backend in the public repository
+        shell: bash
+        run: |
+          if [ -e supabase ]; then
+            echo 'supabase/ is back in the marketing repository.'
+            echo 'Migrations and edge functions belong in the Pravely app repo.'
+            exit 1
+          fi

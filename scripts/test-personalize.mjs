@@ -12,10 +12,10 @@ import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { personalizeWorkbook } from '../supabase/functions/_shared/personalize.ts';
-import { generateLicenseId, isLicenseId } from '../supabase/functions/_shared/license.ts';
-import { buildWelcomeEmail } from '../supabase/functions/_shared/email.ts';
-import { unzipSync, strFromU8, zipSync, strToU8 } from '../supabase/functions/_shared/vendor/fflate.mjs';
+import { personalizeWorkbook } from '../lib/shared/personalize.ts';
+import { generateLicenseId, isLicenseId } from '../lib/shared/license.ts';
+import { buildWelcomeEmail } from '../lib/shared/email.ts';
+import { unzipSync, strFromU8, zipSync, strToU8 } from '../lib/shared/vendor/fflate.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const outDir = join(ROOT, 'test-output');

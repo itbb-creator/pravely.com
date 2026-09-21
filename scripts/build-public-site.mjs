@@ -22,6 +22,7 @@ const publicFiles = [
   'content.json',
   'download.html',
   'email-preferences.html',
+  'eula.html',
   'favicon.ico',
   'favicon.png',
   'favicon.svg',

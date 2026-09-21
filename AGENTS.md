@@ -1,0 +1,127 @@
+# Rules for AI assistants
+
+This file is the single source of truth for every AI assistant working in
+this repository, Codex and Claude alike. `CLAUDE.md` points here.
+
+This is the Pravely marketing site. It deploys to the Netlify site
+`timely-palmier-9a6a82`, which serves pravely.com.
+
+The app itself lives in the separate private repo `itbb-creator/Pravely`.
+Captcha, login, signup, and Supabase auth work belongs there, not here.
+
+## There is no backend in this repository
+
+Every database migration and every edge function lives in the app repo and
+deploys from there. Do not add a `supabase/` directory here, and do not run
+`supabase functions deploy` or `supabase db push` from this checkout. CI fails
+the build if `supabase/` reappears.
+
+This is not a style rule. Until 20 September 2026 this repository carried a
+full copy of the backend, ten days stale: a `create-app-checkout` with no price
+validation, no automatic tax and promotion codes enabled, and a complete set of
+migrations. One deploy from the wrong directory would have replaced the
+hardened production functions with it.
+
+The workbook personalization library the site's own tooling uses — license
+generation, `personalizeWorkbook`, the welcome-email builder, the product
+catalogue — now lives in `lib/shared/`, outside any path the Supabase CLI
+recognises.
+
+## Branches
+
+- `main` is production. Never push to it. Never merge into it.
+- `preview` is the integration branch. All work starts here.
+- Branch from `preview`. Name it for who you are:
+  - Codex: `codex/<short-description>`
+  - Claude: `claude/<short-description>`
+- Open pull requests into `preview`, never into `main`.
+- Merge into `preview` only after the Netlify preview build is green.
+- Only the owner merges `preview` into `main`.
+
+Branches under `archive/` are frozen August work kept for reference. Never
+commit to them, and never delete them.
+
+If asked to "push this fix" with no branch named, use `preview`, and say
+that is what you did.
+
+## Working alongside the other assistant
+
+Two assistants work this repo. Both are useful. Collisions are the risk.
+
+1. **Before starting, look at what is already in flight.** Fetch `preview`
+   fresh, and list the open pull requests. If an open pull request already
+   touches the files you are about to change, say so and stop rather than
+   opening a competing one.
+2. **Stay in your own branch namespace.** Never commit to, rebase, or
+   force-push a branch belonging to the other assistant. If their work
+   needs changing, say so and let the owner decide.
+3. **Merge promptly once green.** A pull request left open for days makes
+   the other assistant build on stale code.
+4. **Rebuild on `preview` rather than resolving a tangle.** If your branch
+   conflicts with something already merged into `preview`, merge `preview`
+   into your branch and fix it there. Never force-push to escape a
+   conflict.
+5. **Say what you changed and where.** Every pull request description names
+   the files touched and the behavior changed.
+
+## Never do these without the owner saying so in the current session
+
+- Force-push, or rewrite history on any branch.
+- Change Netlify production settings or production environment variables.
+- Publish a production deploy.
+- Touch the production Supabase project, Stripe live mode, or any real secret.
+- Commit a secret.
+
+## This repository is public
+
+Anything committed here is world-readable, permanently, including after a
+later commit deletes it. Do not add security audits, incident notes,
+infrastructure details, or anything describing unfixed weaknesses. Those
+belong in the private app repo. Two such documents were moved out on
+September 15, 2026; do not bring them back.
+
+The Turnstile site key in `content.json` and the Supabase publishable key
+are public by design and are fine here.
+
+## Captcha
+
+`account.js` reads `captchaSiteKey` from `content.json`. An empty or
+missing value disables the captcha silently, with no error, because
+`setupCaptcha` returns early and `requireCaptcha` returns true. After any
+captcha change, confirm in a browser that the widget actually renders.
+
+Note that `netlify.toml` redirects `/account.html` to app.pravely.com, so
+this page is not the signup form real users reach.
+
+## Show the plan first, then finish the work
+
+The owner's standing instruction, given 20 September 2026: before acting on
+anything beyond a one-step answer, say what you understood the request to be
+and what you intend to do about it, and let them correct it.
+
+This is not the same as asking permission, and it does not soften the section
+below. The plan is one message at the start, not a checkpoint before every
+step. Once it is approved, carry out the whole thing without stopping — and
+if the work turns out differently than planned, say so in the result rather
+than pausing to re-plan.
+
+`.claude/settings.json` sets `permissions.defaultMode` to `plan` so this
+happens by default rather than by memory.
+
+## Finish the work before handing it back
+
+The owner's standing instruction, given 16 September 2026: complete
+everything that can be completed without them, then end with a short list of
+what is left for them to do.
+
+- Do not stop mid-task to ask permission for a step these rules already
+  allow. Merging a green pull request into `preview` is allowed, so do it
+  rather than asking.
+- Do not lay out options and wait. Choose the sound one, carry it out, and
+  say what was chosen and why.
+- When something genuinely needs the owner — the `preview` to `main` merge,
+  a Netlify or Cloudflare dashboard change, anything under "Never do these
+  without the owner saying so" — do all the work up to that boundary, then
+  give the exact steps they need to take.
+- Ask first only when either choice would be unsafe, or when guessing wrong
+  would waste the work.

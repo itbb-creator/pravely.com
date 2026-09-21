@@ -38,12 +38,12 @@ functions, and `download.html` is served by Netlify like any other page.
 
 | Path | What it is |
 |---|---|
-| `supabase/functions/create-checkout/` | Buy button → Stripe Checkout session |
-| `supabase/functions/stripe-webhook/` | Payment → license pipeline |
-| `supabase/functions/get-download/` | Fresh signed URLs for download.html |
-| `supabase/functions/preview-email/` | Admin view of the stored welcome email |
-| `supabase/functions/_shared/` | License gen, personalization, email, config, audit |
-| `supabase/migrations/…licensing.sql` | Tables + private buckets + RLS |
+| `lib/shared/` | License gen, personalization, email, product config |
+| `create-checkout` (app repo) | Buy button → Stripe Checkout session |
+| `stripe-webhook` (app repo) | Payment → license pipeline |
+| `get-download` (app repo) | Fresh signed URLs for download.html |
+| `preview-email` (app repo) | Admin view of the stored welcome email |
+| `…licensing.sql` (app repo) | Tables + private buckets + RLS |
 | `assets/masters/*.xlsx` | Master workbooks (placeholders — swap in yours) |
 | `scripts/seed-masters.mjs` | Upload masters to Supabase |
 | `scripts/simulate-purchase.mjs` | Test the whole pipeline without Stripe |
@@ -55,7 +55,8 @@ functions, and `download.html` is served by Netlify like any other page.
 
 1. [supabase.com](https://supabase.com) → New project (free tier is plenty).
 2. SQL Editor → paste the contents of
-   `supabase/migrations/20260814000000_licensing.sql` → Run.
+   `supabase/migrations/20260814000000_licensing.sql`, **from the Pravely app
+   repository** → Run.
    This creates `licenses`, `license_events`, `stripe_events`, the two
    private storage buckets, and locks them to the service role.
 

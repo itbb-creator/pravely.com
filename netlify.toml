@@ -40,6 +40,26 @@
   status = 200
 
 [[redirects]]
+  from = "/privacy"
+  to = "/privacy.html"
+  status = 200
+
+[[redirects]]
+  from = "/terms"
+  to = "/terms.html"
+  status = 200
+
+[[redirects]]
+  from = "/eula"
+  to = "/eula.html"
+  status = 200
+
+[[redirects]]
+  from = "/contact"
+  to = "/contact.html"
+  status = 200
+
+[[redirects]]
   from = "/confirmation"
   to = "/confirmation.html"
   status = 200

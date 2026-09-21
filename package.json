@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Pravely — static site + licensed workbook delivery pipeline (Supabase Edge Functions)",
+  "description": "Pravely — the public marketing site, and the workbook personalization tooling behind licensed delivery",
   "scripts": {
     "build:features": "node scripts/build-feature-page.mjs",
     "build:site": "npm run build:features && node scripts/build-public-site.mjs",
@@ -11,10 +11,12 @@
     "seed": "node scripts/seed-masters.mjs",
     "simulate": "node --experimental-strip-types scripts/simulate-purchase.mjs",
     "email-release": "node --experimental-strip-types scripts/send-release-update.mjs",
-    "test": "node --experimental-strip-types scripts/test-personalize.mjs",
-    "test:health-coach": "node --experimental-strip-types scripts/test-health-coach.mjs",
+    "test": "npm run test:personalize && npm run test:pricing && npm run test:legal-pages",
+    "test:personalize": "node --experimental-strip-types scripts/test-personalize.mjs",
+    "test:pricing": "node --experimental-strip-types scripts/test-pricing.mjs",
+    "test:legal-pages": "node scripts/test-legal-pages.mjs",
     "test:repository-core": "node --experimental-strip-types scripts/test-repository-core.mjs",
-    "test:release-hardening": "node scripts/test-release-hardening.mjs && node scripts/build-feature-page.mjs --check",
+    "test:feature-page": "node scripts/test-feature-page.mjs",
     "test:public-site": "npm run build:site && node scripts/test-public-site.mjs && node scripts/test-public-links.mjs"
   },
   "engines": {

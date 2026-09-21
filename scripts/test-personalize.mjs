@@ -14,6 +14,7 @@ import { fileURLToPath } from 'node:url';
 
 import { personalizeWorkbook } from '../lib/shared/personalize.ts';
 import { generateLicenseId, isLicenseId } from '../lib/shared/license.ts';
+import { PRODUCTS } from '../lib/shared/config.ts';
 import { buildWelcomeEmail } from '../lib/shared/email.ts';
 import { unzipSync, strFromU8, zipSync, strToU8 } from '../lib/shared/vendor/fflate.mjs';
 
@@ -35,7 +36,7 @@ const generated = new Set(Array.from({ length: 200 }, () => generateLicenseId())
 check(generated.size === 200, '200 generated license ids are all unique');
 
 // --- personalization on each product master ---
-for (const product of ['essentials', 'complete', 'premium']) {
+for (const product of PRODUCTS.map((entry) => entry.id)) {
   const master = readFileSync(join(ROOT, 'assets/masters', `${product}.xlsx`));
   const result = personalizeWorkbook({
     masterBytes: new Uint8Array(master),
@@ -44,7 +45,7 @@ for (const product of ['essentials', 'complete', 'premium']) {
     customerEmail: 'john@email.com',
   });
 
-  const outPath = join(outDir, `Pravely_${product === 'premium' ? 'Premium_Toolkit' : product[0].toUpperCase() + product.slice(1)}_PRV-7K4X9P2M.xlsx`);
+  const outPath = join(outDir, `Pravely_${product[0].toUpperCase() + product.slice(1)}_PRV-7K4X9P2M.xlsx`);
   writeFileSync(outPath, result.bytes);
 
   const before = unzipSync(new Uint8Array(master));
@@ -88,7 +89,7 @@ for (const product of ['essentials', 'complete', 'premium']) {
 
 // --- xmlEscape edge cases ---
 const tricky = personalizeWorkbook({
-  masterBytes: new Uint8Array(readFileSync(join(ROOT, 'assets/masters', 'premium.xlsx'))),
+  masterBytes: new Uint8Array(readFileSync(join(ROOT, 'assets/masters', 'essentials.xlsx'))),
   licenseId: 'PRV-7K4X9P2M',
   customerName: "O'Brien & Sons <LLC>",
   customerEmail: 'obrien@sons.com',

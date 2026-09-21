@@ -15,6 +15,20 @@ export interface ProductConfig {
   priceEnv: string;
 }
 
+/**
+ * The workbooks Pravely delivers.
+ *
+ * One, now. Complete and Premium were separate paid spreadsheets with their own
+ * Stripe prices and master files; the site stopped offering them, the app plans
+ * took over what they did, and they sat here afterwards as configuration nobody
+ * read — still resolvable by anyone holding an old license, still needing their
+ * masters kept in step with a product that had moved on.
+ *
+ * The Essentials toolkit is the whole workbook line: free with any account, and
+ * the founding edition founders are promised. Do not confuse these ids with the
+ * app plans, which are also called plus and complete and are sold by a
+ * different function entirely.
+ */
 export const PRODUCTS: ProductConfig[] = [
   {
     id: 'essentials',
@@ -22,20 +36,6 @@ export const PRODUCTS: ProductConfig[] = [
     masterPath: 'essentials.xlsx',
     fileNamePrefix: 'Pravely_Essentials',
     priceEnv: 'STRIPE_PRICE_ESSENTIALS',
-  },
-  {
-    id: 'complete',
-    name: 'Pravely Complete',
-    masterPath: 'complete.xlsx',
-    fileNamePrefix: 'Pravely_Complete',
-    priceEnv: 'STRIPE_PRICE_COMPLETE',
-  },
-  {
-    id: 'premium',
-    name: 'Pravely Premium Toolkit',
-    masterPath: 'premium.xlsx',
-    fileNamePrefix: 'Pravely_Premium_Toolkit',
-    priceEnv: 'STRIPE_PRICE_PREMIUM_FOUNDING',
   },
 ];
 

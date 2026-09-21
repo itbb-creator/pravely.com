@@ -29,7 +29,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const args = Object.fromEntries(
   process.argv.slice(2).map((a) => (a.startsWith('--') ? a.slice(2).split(/=(.*)/s) : [])).filter((a) => a.length === 2),
 );
-const product = getProduct(args.product ?? 'premium');
+const product = getProduct(args.product ?? 'essentials');
 if (!product) {
   console.error(`Unknown product "${args.product}". Valid: ${PRODUCTS.map((p) => p.id).join(', ')}`);
   process.exit(1);

@@ -5,14 +5,11 @@
  * app and the marketing site both describe this offer, and a customer who
  * reads one and buys from the other must not find a different promise. The
  * wording here is the promise; treat an edit as a change to what has been sold.
- *
- * A mirror of the same file in the Pravely app repository, for the reason
- * given at the top of product-catalog.ts. Change both together.
  */
 
 import { PRODUCT_CATALOG } from "./product-catalog.ts";
 
-const { seatLimit, completeOnboardingSeats, windowDays } = PRODUCT_CATALOG.foundingOffer;
+const { seatLimit, windowDays } = PRODUCT_CATALOG.foundingOffer;
 
 export const FOUNDING_HEADLINE =
   `Be one of the first ${seatLimit} people building a calmer, more intentional ` +
@@ -76,13 +73,19 @@ export const FOUNDING_PROVISIONS: readonly FoundingProvision[] = [
       "feature will be built.",
   },
   {
-    id: "onboarding",
-    title: `An onboarding session for the first ${completeOnboardingSeats} Complete buyers`,
+    id: "support",
+    title: "Priority support",
+    /**
+     * Deliberately a promise about order, not about elapsed time.
+     *
+     * "Answered within a day" is a commitment that breaks the first time Justin
+     * is asleep, travelling or on duty, and a founding provision that quietly
+     * stops being true is worse than one never offered. Going first is
+     * something that can always be honoured.
+     */
     detail:
-      "An optional 30-minute session to set Pravely up around how you " +
-      "actually manage money. It is help using the product, not financial " +
-      "advice.",
-    limited: true,
+      "Your messages go to the front of the queue. Founders are answered " +
+      "before other support requests, for as long as you use Pravely.",
   },
 ] as const;
 

@@ -193,10 +193,10 @@ function buildWorkbook(product) {
   });
 }
 
+// One product. Complete and Premium were retired; see PRODUCTS in
+// lib/shared/config.ts, which is the definition this has to stay in step with.
 const products = [
   { id: 'essentials', name: 'Pravely Essentials' },
-  { id: 'complete', name: 'Pravely Complete' },
-  { id: 'premium', name: 'Pravely Premium Toolkit' },
 ];
 
 const outDir = join(ROOT, 'assets/masters');

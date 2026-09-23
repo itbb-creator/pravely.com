@@ -40,12 +40,6 @@ export const PRODUCT_CATALOG = {
      */
     windowDays: 60,
     seatLimit: 75,
-    /**
-     * The first buyers to reach Complete are also offered a 30-minute
-     * onboarding session. Counted separately from the seat number, because a
-     * founder who starts on Plus and upgrades later is still a Complete buyer.
-     */
-    completeOnboardingSeats: 20,
     plus: { amountCents: 6_900, regularAmountCents: 8_900 },
     complete: { amountCents: 13_900, regularAmountCents: 16_900 },
     completeUpgrade: { amountCents: 9_000 },

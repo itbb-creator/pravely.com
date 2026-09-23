@@ -39,19 +39,18 @@
     "label": "Founding offer",
     "note": "Founding prices are live now. The regular price is shown beside each plan so you can see what you save.",
     "headline": "Be one of the first 75 people building a calmer, more intentional financial life with Pravely.",
-    "window": "The founding offer runs for 60 days from launch, or until all 75 founding places are taken \u2014 whichever comes first.",
+    "window": "The founding offer runs for 60 days from launch, or until all 75 founding places are taken — whichever comes first.",
     "closesAt": null,
     "seatLimit": 75,
     "windowDays": 60,
-    "completeOnboardingSeats": 20,
     "includes": [
-      "The founding price, kept for good \u2014 Plus for $69 instead of $89, Complete for $139 instead of $169.",
+      "The founding price, kept for good — Plus for $69 instead of $89, Complete for $139 instead of $169.",
       "A founding edition of the Pravely workbook.",
       "A founders badge on your Pravely profile.",
-      "A numbered founders certificate \u2014 Founder #12 of 75, issued in the order people buy.",
+      "A numbered founders certificate — Founder #12 of 75, issued in the order people buy.",
       "A personal welcome letter.",
       "Founders can vote on the roadmap and receive early testing invitations. Votes inform prioritization but do not guarantee that a feature will be built.",
-      "For the first 20 Complete buyers, an optional 30-minute onboarding session \u2014 help using the product, not financial advice."
+      "Priority support — your messages go to the front of the queue, and founders are answered before other support requests."
     ]
   }
 }

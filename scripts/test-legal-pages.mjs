@@ -54,18 +54,16 @@ for (const [name, html] of Object.entries(pages)) {
   check(!html.includes('<bdt'), `${name} carries no leftover editor markup`);
 }
 
-console.log('\nUnanswered generator blanks are the ones we know about');
-// Termly leaves __________ where a questionnaire answer is missing. The three
-// in the privacy policy were its data-request link, and are resolved. The rest
-// are a notice method, a firmware version, and the licensor's own name and
-// state, which are the owner's to answer in Termly rather than ours to invent.
-// Pinning the count is what makes a regenerated document that introduces a new
-// blank fail here instead of publishing a broken sentence.
-const EXPECTED_BLANKS = { 'privacy.html': 0, 'terms.html': 1, 'eula.html': 4 };
-for (const [name, expected] of Object.entries(EXPECTED_BLANKS)) {
-  const found = pages[name].split('__________').length - 1;
-  check(found === expected,
-    `${name} has ${expected} unfilled generator blank(s) (found ${found})`);
+console.log('\nEvery generator blank has been answered');
+// Termly leaves __________ where a questionnaire answer is missing. All of them
+// are now filled: the data-request link in the privacy policy, the notice
+// method in the terms, and the state twice, the minimum OS and the licensor's
+// own name in the EULA. There is no longer any reason for one to exist, so this
+// is a flat zero rather than a per-page tolerance — a regenerated document that
+// reintroduces one fails here instead of publishing a broken sentence.
+for (const [name, html] of Object.entries(pages)) {
+  const found = html.split('__________').length - 1;
+  check(found === 0, `${name} has no unanswered generator blank (found ${found})`);
 }
 
 console.log('\nNo word is glued to the punctuation before it');

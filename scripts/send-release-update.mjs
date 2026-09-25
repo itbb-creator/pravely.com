@@ -32,7 +32,7 @@ const siteUrl = (process.env.SITE_URL || 'https://pravely.com').replace(/\/+$/, 
 console.log(`${send ? 'SEND' : 'DRY RUN'}: ${product} ${version} → ${licenses.length} customer(s)`);
 for (const license of licenses) {
   const message = buildReleaseUpdateEmail({
-    productName: product === 'premium' ? 'Pravely Premium Toolkit' : `Pravely ${product[0].toUpperCase()}${product.slice(1)}`,
+    productName: `Pravely ${product[0].toUpperCase()}${product.slice(1)}`,
     customerName: license.customer_name || 'there',
     licenseId: license.license_id,
     version,

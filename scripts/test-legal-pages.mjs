@@ -54,18 +54,55 @@ for (const [name, html] of Object.entries(pages)) {
   check(!html.includes('<bdt'), `${name} carries no leftover editor markup`);
 }
 
-console.log('\nUnanswered generator blanks are the ones we know about');
-// Termly leaves __________ where a questionnaire answer is missing. The three
-// in the privacy policy were its data-request link, and are resolved. The rest
-// are a notice method, a firmware version, and the licensor's own name and
-// state, which are the owner's to answer in Termly rather than ours to invent.
-// Pinning the count is what makes a regenerated document that introduces a new
-// blank fail here instead of publishing a broken sentence.
-const EXPECTED_BLANKS = { 'privacy.html': 0, 'terms.html': 1, 'eula.html': 4 };
-for (const [name, expected] of Object.entries(EXPECTED_BLANKS)) {
-  const found = pages[name].split('__________').length - 1;
-  check(found === expected,
-    `${name} has ${expected} unfilled generator blank(s) (found ${found})`);
+console.log('\nEvery generator blank has been answered');
+// Termly leaves __________ where a questionnaire answer is missing. All of them
+// are now filled: the data-request link in the privacy policy, the notice
+// method in the terms, and the state twice, the minimum OS and the licensor's
+// own name in the EULA. There is no longer any reason for one to exist, so this
+// is a flat zero rather than a per-page tolerance — a regenerated document that
+// reintroduces one fails here instead of publishing a broken sentence.
+for (const [name, html] of Object.entries(pages)) {
+  const found = html.split('__________').length - 1;
+  check(found === 0, `${name} has no unanswered generator blank (found ${found})`);
+}
+
+console.log('\nNo word is glued to the punctuation before it');
+// Read the way a browser renders, not the way the file is written. That
+// distinction is the whole check: an inline tag contributes no space, so
+// `process?</strong>When` renders as "process?When" while every tool that
+// replaced a tag with a space read it as "process? When" and saw nothing wrong.
+// That is how it survived a prose diff, a dictionary scan and a repair pass.
+//
+// &nbsp; is a space, which is what separates the one real defect from the five
+// sibling questions in the same list that were always correct.
+const INLINE_TAGS = /<\/?(?:span|b|i|u|s|em|strong|a|sub|sup|small|font|bdt)(?:\s[^>]*)?>/gi;
+const GLUED = /[a-z][.!?:;,][A-Z][a-z]{2,}/g;
+for (const [name, html] of Object.entries(pages)) {
+  const rendered = html.replace(INLINE_TAGS, '');
+  const glued = [...new Set(rendered.match(GLUED) ?? [])]
+    // &nbsp; ends in "p;", so a capital after it is a space, not a defect.
+    .filter((hit) => !hit.startsWith('p;'));
+  check(
+    glued.length === 0,
+    glued.length === 0
+      ? `${name} has no word glued to the punctuation before it`
+      : `${name} has glued text: ${glued.join(', ')}`,
+  );
+}
+
+console.log('\nThe offer wall stays gone');
+// Termly generated a section describing third-party advertisers paying users in
+// virtual currency, with the user ID shared with the provider. Pravely has no
+// offer wall, so publishing it described data sharing that does not happen. A
+// regenerated document must not quietly bring it back.
+// Comments are not published text, and the note recording the removal names
+// the thing it removed.
+const withoutComments = (html) => html.replace(/<!--[\s\S]*?-->/g, '');
+for (const [name, html] of Object.entries(pages)) {
+  check(
+    !/offer wall/i.test(withoutComments(html)),
+    `${name} does not describe an offer wall`,
+  );
 }
 
 console.log('\nThe workbook licence survived the move out of the terms');

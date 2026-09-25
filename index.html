@@ -87,7 +87,10 @@
         .then(r => r.ok ? r.json() : null)
         .then(offer => {
           if (offer && (offer.offer === 'regular' || offer.offer === 'founding')) {
-            if (offer.offer === 'regular') toRegular(offer.prices);
+            // Before launch, the published founding prices are the announced
+            // launch prices. Checkout itself remains closed until launchDate is
+            // set. Only an ended or sold-out offer should replace them.
+            if (offer.offer === 'regular' && offer.reason !== 'not_launched') toRegular(offer.prices);
             return;
           }
           if (expired) toRegular(null);

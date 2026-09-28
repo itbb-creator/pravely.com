@@ -140,6 +140,14 @@ check(
   'index.html asks the server which offer is in force',
 );
 check(
+  /offer\.offer === 'regular' && offer\.reason !== 'not_launched'/.test(html),
+  'the planned founding price remains visible before checkout opens',
+);
+check(
+  /Founding prices begin when Pravely launches/.test(content.foundingOffer?.note || ''),
+  'the marketing note does not claim the unlaunched offer is already live',
+);
+check(
   content.foundingOffer && 'closesAt' in content.foundingOffer,
   'content.json carries the deadline the page falls back to when the server is unreachable',
 );

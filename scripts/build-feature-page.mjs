@@ -29,7 +29,7 @@ const badge = (value) => {
   const normalized = value.toLowerCase();
   let className = 'neutral';
   if (value === '✓' || normalized === 'yes' || normalized.startsWith('yes,')) className = 'included';
-  else if (normalized.includes('later') || normalized.includes('planned') || normalized.includes('future')) className = 'future';
+  else if (normalized.includes('later') || normalized.includes('planned') || normalized.includes('future') || normalized.includes('potential')) className = 'future';
   else if (normalized.includes('admin')) className = 'admin';
   else if (value === '—' || normalized === 'no' || normalized === 'n/a') className = 'none';
   return `<span class="status ${className}">${escapeHtml(value)}</span>`;
@@ -64,7 +64,7 @@ const html = `<!doctype html>
   <a class="skip" href="#main">Skip to feature table</a>
   <header><div class="wrap nav"><a class="logo" href="./" aria-label="Pravely home"><img src="./images/pravely-logo-horizontal.png" alt="Pravely"></a><nav class="links" aria-label="Product information"><a href="./">Home</a><a href="./changelog.html">Changelog</a><a href="./features.html" aria-current="page">Features</a></nav></div></header>
   <main id="main">
-    <section class="hero"><div class="wrap"><div class="eyebrow">Living product guide · Updated September 2026</div><h1>What you get now—and what comes later.</h1><p>This table is Pravely’s public source of truth for plan access, platforms, implementation, verification, and customer wording. “Later” and “planned” features are roadmap items, not promises that they are available today.</p><div class="legend" aria-label="Status legend"><span class="status included">✓ Included now</span><span class="status future">Later or planned</span><span class="status none">— Not included</span></div></div></section>
+    <section class="hero"><div class="wrap"><div class="eyebrow">Living product guide · Updated October 2026</div><h1>What you get now—and what comes later.</h1><p>This table is Pravely’s public source of truth for plan access, platforms, implementation, verification, and customer wording. “Later” and “planned” features are roadmap items, not promises that they are available today.</p><div class="legend" aria-label="Status legend"><span class="status included">✓ Included now</span><span class="status future">Later or planned</span><span class="status none">— Not included</span></div></div></section>
     <section class="content"><div class="wrap">
       <div class="intro"><div class="card"><h2>Web and installable PWA</h2><p>The responsive web app and installable PWA are the first release. Dedicated iOS and Android packages follow only after their own purchasing, restoration, signing, and physical-device testing.</p></div><div class="card"><h2>Seven-day trial</h2><p>The trial provides Complete access for seven days. After expiry, the editable workspace locks; the paywall still lets customers review or export their saved information, purchase access, sign out, or delete their data and account.</p></div></div>
       <div class="table-shell" tabindex="0" role="region" aria-label="Scrollable Pravely feature availability table">

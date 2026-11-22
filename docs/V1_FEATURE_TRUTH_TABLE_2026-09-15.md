@@ -1,6 +1,6 @@
 # Pravely v1 feature truth table
 
-Effective date: 2026-09-15  
+Effective date: 2026-11-22
 Launch surface: responsive web app plus installable PWA on supported browsers
 Product approver and customer-support owner: Founder (sole owner)  
 
@@ -30,21 +30,17 @@ This is the single review sheet for what Pravely sells, where each feature works
 | AI Health Coach | ✓ | — | ✓ | ✓ | ✓ | Later | Later | Yes, hardened | Production funded response, kill switch, and recovery passed; preview authorization, outage, and alert-route tests passed | Founder | “Ask for optional educational guidance based on your Pravely calculations.” |
 | Search and navigation | ✓ | ✓ | ✓ | ✓ | ✓ | Later | Later | Yes | Type check; keyboard/browser tests pending | Founder | “Find features and your saved planning items quickly.” |
 | Settings, privacy choices, and data controls | ✓ | ✓ | ✓ | ✓ | ✓ | Later | Later | Yes | Source reviewed; full browser journey pending | Founder | “Control appearance, notifications, security, and your data.” |
-| Original Essentials workbook | Founding offer | Founding offer | Founding offer | Download | N/A | N/A | N/A | Yes | Personalization suite passed; live delivery retest pending | Founder | “The founding offer includes the free original Essentials workbook.” |
 | Product feedback and support contact | ✓ | ✓ | ✓ | ✓ | ✓ | Later | Later | Yes | Source reviewed; end-to-end inbox delivery pending | Founder | “Contact Pravely without sending passwords or detailed financial data.” |
 | Installable PWA release | ✓ | ✓ | ✓ | ✓ | ✓ | — | — | Yes | Automated prompt capture, Settings visibility, and route tests passed; Chrome, Edge, Safari, Android, iPhone install/update/offline/recovery checks remain launch blockers | Founder | “Install Pravely from a supported browser for an app-like experience.” |
-| Dedicated iOS app | — | — | — | — | — | Later | — | Project exists | Store purchase/restore, signing, and devices pending | Founder | “Planned after store and physical-device verification.” |
-| Dedicated Android app | — | — | — | — | — | — | Later | Project exists | Store purchase/restore, signing, and devices pending | Founder | “Planned after store and physical-device verification.” |
 | Push notifications | — | — | — | — | Later | Later | Later | Partial scaffolding | Sender/device tests pending | Founder | Do not market as available; include only in the later native release plan. |
-| Biometric app lock | — | — | — | — | — | Later | Later | Native code exists | Physical-device certification pending | Founder | “Planned with the dedicated mobile apps.” |
 | Annual financial review | — | — | — | — | Later | Later | Later | Not in launch scope | Product and operating process pending | Founder | “Planned after the responsive web launch.” |
-| Expanded projections | — | — | Planned option | Later | Later | Later | Later | Not in launch scope | Calculation and UX specification pending | Founder | “A planned optional capability for Complete after launch.” |
-| Bill dates and calendar | — | — | Planned option | Later | Later | Later | Later | Not in launch scope | Calendar, time-zone, and alert testing pending | Founder | “A planned optional capability for Complete after launch.” |
+| Expanded projections | — | — | Projected | Later | Later | Later | Later | Not in launch scope | Calculation and UX specification pending | Founder | “A projected optional capability for Complete after launch.” |
+| Bill dates and calendar | — | — | Projected | Later | Later | Later | Later | Not in launch scope | Calendar, time-zone, and alert testing pending | Founder | “A projected optional capability for Complete after launch.” |
 | Credit card and rewards tracker | ✓ | — | ✓ | ✓ | ✓ | Later | Later | Yes | Current/closed/future cards, rewards-wallet totals, score history, cloud save/export, focused tests, production build, browser matrix and deploy preview passed | Founder | “Track current, closed and future cards, rewards totals, signup bonuses, benefits, fees and credit-score history with Complete.” |
 | Card Optimizer | — | — | Potential add-on | Later | Later | Later | Later | Concept only | Source-backed catalog, stale-data fallback, recommendation safety, billing and store entitlement work pending | Founder | “A potential future add-on; pricing and availability have not been announced.” |
-| Optional bank synchronization | — | — | Planned option | Later | Later | Later | Later | Not in launch scope | Provider, consent, security, and reconciliation work pending | Founder | “A planned opt-in capability for Complete after launch.” |
-| Household and partner sharing | — | — | Planned option | Later | Later | Later | Later | Not in launch scope | Permission, privacy, removal, and audit testing pending | Founder | “A planned optional capability for Complete after launch.” |
-| Customization options | — | — | Planned option | Later | Later | Later | Later | Not in launch scope | Scope and persistence tests pending | Founder | “Planned customization options for Complete after launch.” |
+| Optional bank synchronization | — | — | Projected | Later | Later | Later | Later | Not in launch scope | Provider, consent, security, and reconciliation work pending | Founder | “A projected opt-in capability for Complete after launch.” |
+| Household and partner sharing | — | — | Projected | Later | Later | Later | Later | Not in launch scope | Permission, privacy, removal, and audit testing pending | Founder | “A projected optional capability for Complete after launch.” |
+| Customization options | — | — | Projected | Later | Later | Later | Later | Not in launch scope | Scope and persistence tests pending | Founder | “Projected customization options for Complete after launch.” |
 
 ## V1 acceptance tests and failure responses
 

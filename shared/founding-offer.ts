@@ -37,13 +37,6 @@ export const FOUNDING_PROVISIONS: readonly FoundingProvision[] = [
       "payment, and access for the life of the product.",
   },
   {
-    id: "workbook",
-    title: "The legacy workbook",
-    detail:
-      "A founding edition of the Pravely workbook, alongside the Essentials " +
-      "workbook included with every account.",
-  },
-  {
     id: "badge",
     title: "A founders badge on your profile",
     detail:

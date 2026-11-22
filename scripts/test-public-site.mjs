@@ -25,9 +25,18 @@ assert.match(text, /tiktok\.com\/@pravelyus/i);
 assert.match(text, /\$69 founding price/i);
 assert.match(text, /\$139 founding price/i);
 assert.match(text, /normally \$169/i);
-assert.match(text, /\$90 one time/i);
+assert.match(text, /normally \$169 then \$79 per year/i);
+assert.match(text, /normally \$89 once/i);
+assert.doesNotMatch(text, /\$90 one time/i);
+assert.match(text, /lifetime of the (?:Pravely )?product/i);
 assert.doesNotMatch(text, /\$159\b|\$70\b/i);
 assert.doesNotMatch(featurePage, /Pravely (?:internal|business) accounting/i);
+
+for (const page of publicPages.filter((name) => name.endsWith('.html'))) {
+  const pageText = await readFile(new URL(page, output), 'utf8');
+  assert.match(pageText, /pravely-site-footer/, `${page} must use the shared footer`);
+  assert.match(pageText, /pravely-logo-horizontal\.png/, `${page} must use the primary Pravely logo`);
+}
 
 for (const privatePath of [
   'docs',

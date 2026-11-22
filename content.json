@@ -15,19 +15,18 @@
     "plus": {
       "name": "Pravely Plus",
       "price": "$69",
-      "regularPrice": "$89",
+      "regularPrice": "$89 once",
       "blurb": "Founding-offer one-time purchase"
     },
     "complete": {
       "name": "Pravely Complete",
       "price": "$139",
-      "regularPrice": "$169",
+      "regularPrice": "$169 then $79 per year",
       "blurb": "Founding-offer one-time purchase"
     },
     "upgrade": {
       "name": "Plus to Complete upgrade",
-      "price": "$90",
-      "blurb": "One-time purchase"
+      "blurb": "Upgrade to Complete from inside the app"
     }
   },
   "socialLinks": {
@@ -38,16 +37,15 @@
   "foundingOffer": {
     "label": "Founding offer",
     "note": "Founding prices begin when Pravely launches. The regular price is shown beside each plan so you can see what you save.",
-    "headline": "Be one of the first 75 people building a calmer, more intentional financial life with Pravely.",
-    "window": "The founding offer runs for 60 days from launch, or until all 75 founding places are taken — whichever comes first.",
+    "headline": "Be one of the first 50 people building a calmer, more intentional financial life with Pravely.",
+    "window": "The founding offer runs for 60 days from launch, or until all 50 founding places are taken — whichever comes first.",
     "closesAt": null,
-    "seatLimit": 75,
+    "seatLimit": 50,
     "windowDays": 60,
     "includes": [
-      "The founding price, kept for good — Plus for $69 instead of $89, Complete for $139 instead of $169.",
-      "A founding edition of the Pravely workbook.",
+      "The founding price, kept for good — Plus for $69 instead of $89 once, Complete for $139 instead of $169 then $79 per year. Founders keep access for the lifetime of the product.",
       "A founders badge on your Pravely profile.",
-      "A numbered founders certificate — Founder #12 of 75, issued in the order people buy.",
+      "A numbered founders certificate — Founder #12 of 50, issued in the order people buy.",
       "A personal welcome letter.",
       "Founders can vote on the roadmap and receive early testing invitations. Votes inform prioritization but do not guarantee that a feature will be built.",
       "Priority support — your messages go to the front of the queue, and founders are answered before other support requests."

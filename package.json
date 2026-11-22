@@ -6,7 +6,7 @@
   "description": "Pravely — the public marketing site, and the workbook personalization tooling behind licensed delivery",
   "scripts": {
     "build:features": "node scripts/build-feature-page.mjs",
-    "build:site": "npm run build:features && node scripts/build-public-site.mjs",
+    "build:site": "npm run build:features && node scripts/build-public-site.mjs && node scripts/normalize-public-chrome.mjs",
     "masters": "node scripts/make-placeholder-masters.mjs",
     "seed": "node scripts/seed-masters.mjs",
     "simulate": "node --experimental-strip-types scripts/simulate-purchase.mjs",

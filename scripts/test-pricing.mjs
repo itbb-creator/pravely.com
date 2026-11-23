@@ -131,6 +131,8 @@ check(regular.complete.renewalAmountCents === 7_900,
   'regular Complete renews for $79 per year');
 check(regular.completeUpgrade.renewalAmountCents === 7_900,
   'a regular upgrade renews for $79 per year');
+check(regular.completeUpgrade.amountCents === 7_900,
+  'a regular upgrade starts at $79 with no separate first-year fee');
 check(
   regular.plus.regularAmountCents === undefined,
   'the regular offer has nothing to strike through',

@@ -6,6 +6,7 @@ const output = new URL('../site-dist/', import.meta.url);
 const publicPages = (await readdir(output)).filter((name) => /\.(?:html|json)$/.test(name));
 const text = (await Promise.all(publicPages.map((name) => readFile(new URL(name, output), 'utf8')))).join('\n');
 const featurePage = await readFile(new URL('features.html', output), 'utf8');
+const homePage = await readFile(new URL('index.html', output), 'utf8');
 
 for (const forbidden of [
   /coming soon/i,
@@ -25,9 +26,29 @@ assert.match(text, /tiktok\.com\/@pravelyus/i);
 assert.match(text, /\$69 founding price/i);
 assert.match(text, /\$139 founding price/i);
 assert.match(text, /normally \$169/i);
-assert.match(text, /\$90 one time/i);
+assert.match(text, /normally \$169 then \$79 per year/i);
+assert.match(text, /normally \$89 once/i);
+assert.match(homePage, /<h2>Projected Complete Options<\/h2>/);
+assert.doesNotMatch(text, /\$90 one time/i);
+assert.match(text, /lifetime of the (?:Pravely )?product/i);
 assert.doesNotMatch(text, /\$159\b|\$70\b/i);
 assert.doesNotMatch(featurePage, /Pravely (?:internal|business) accounting/i);
+
+for (const page of publicPages.filter((name) => name.endsWith('.html'))) {
+  const pageText = await readFile(new URL(page, output), 'utf8');
+  assert.equal((pageText.match(/<footer class="pravely-site-footer">/g) ?? []).length, 1,
+    `${page} must use exactly one shared footer`);
+  assert.match(pageText, /pravely-logo-horizontal\.png/, `${page} must use the primary Pravely logo`);
+  for (const social of ['Facebook', 'Instagram', 'TikTok']) {
+    assert.match(pageText, new RegExp(`aria-label="${social}"`), `${page} must include the ${social} icon`);
+  }
+  const header = pageText.match(/<header\b[\s\S]*?<\/header>/i)?.[0];
+  if (header) {
+    assert.match(header, /pravely-logo-horizontal\.png/, `${page} header must use the home-page logo`);
+    assert.doesNotMatch(header, /pravely-app-icon|pravely-logo-stacked|logo\.svg/i,
+      `${page} header must not use an alternate logo`);
+  }
+}
 
 for (const privatePath of [
   'docs',

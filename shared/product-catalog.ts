@@ -17,7 +17,7 @@
  * nothing here that is not already on the pricing page.
  */
 export const PRODUCT_CATALOG = {
-  effectiveDate: "2026-09-19",
+  effectiveDate: "2026-11-22",
   currency: "usd",
   territory: "US",
   trialDays: 7,
@@ -39,15 +39,15 @@ export const PRODUCT_CATALOG = {
      * seats running out.
      */
     windowDays: 60,
-    seatLimit: 75,
+    seatLimit: 50,
     plus: { amountCents: 6_900, regularAmountCents: 8_900 },
     complete: { amountCents: 13_900, regularAmountCents: 16_900 },
     completeUpgrade: { amountCents: 9_000 },
   },
   regularOffer: {
     plus: { amountCents: 8_900 },
-    complete: { amountCents: 16_900 },
-    completeUpgrade: { amountCents: 9_000 },
+    complete: { amountCents: 16_900, renewalAmountCents: 7_900 },
+    completeUpgrade: { amountCents: 7_900, renewalAmountCents: 7_900 },
   },
 } as const;
 
@@ -55,8 +55,8 @@ export type OfferName = "founding" | "regular";
 
 export type OfferPrices = {
   plus: { amountCents: number; regularAmountCents?: number };
-  complete: { amountCents: number; regularAmountCents?: number };
-  completeUpgrade: { amountCents: number };
+  complete: { amountCents: number; regularAmountCents?: number; renewalAmountCents?: number };
+  completeUpgrade: { amountCents: number; renewalAmountCents?: number };
 };
 
 /**
@@ -111,7 +111,7 @@ export type FoundingOfferStatus = {
  * Whether a founding seat can still be claimed.
  *
  * Both limits are checked, because either one alone would be the wrong offer:
- * sixty days with unlimited seats is not a cohort of 75, and 75 seats with no
+ * sixty days with unlimited seats is not a cohort of 50, and 50 seats with no
  * deadline never ends if only sixty people buy.
  */
 export function foundingOfferStatus(input?: {

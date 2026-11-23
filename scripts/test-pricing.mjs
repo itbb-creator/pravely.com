@@ -47,14 +47,14 @@ console.log('content.json matches the catalog');
 const content = JSON.parse(readFileSync(join(ROOT, 'content.json'), 'utf8'));
 check(content.pricing?.plus?.price === expected.plusFounding,
   `Plus is ${expected.plusFounding} (found ${content.pricing?.plus?.price})`);
-check(content.pricing?.plus?.regularPrice === expected.plusRegular,
+check(content.pricing?.plus?.regularPrice === `${expected.plusRegular} once`,
   `Plus regular price is ${expected.plusRegular} (found ${content.pricing?.plus?.regularPrice})`);
 check(content.pricing?.complete?.price === expected.completeFounding,
   `Complete is ${expected.completeFounding} (found ${content.pricing?.complete?.price})`);
-check(content.pricing?.complete?.regularPrice === expected.completeRegular,
+check(content.pricing?.complete?.regularPrice === `${expected.completeRegular} then $79 per year`,
   `Complete regular price is ${expected.completeRegular} (found ${content.pricing?.complete?.regularPrice})`);
-check(content.pricing?.upgrade?.price === expected.upgrade,
-  `Upgrade is ${expected.upgrade} (found ${content.pricing?.upgrade?.price})`);
+check(!('price' in (content.pricing?.upgrade ?? {})),
+  'the public configuration says an upgrade is available without publishing its price');
 
 // The saving is the entire reason both numbers are shown. A regular price that
 // is not higher than the founding price is worse than showing nothing.
@@ -74,13 +74,17 @@ check(Boolean(section), 'the pricing section is where the test expects it');
 
 if (section) {
   const pricing = section[0];
-  for (const [name, value] of Object.entries(expected)) {
+  for (const [name, value] of Object.entries(expected).filter(([name]) => name !== 'upgrade')) {
     check(pricing.includes(value), `${name} (${value}) appears in the pricing section`);
   }
 
   // "$0 to start" is the trial card, not a price in the catalog. It is the
   // one amount allowed through that the catalog does not name.
-  const approved = new Set([...Object.values(expected), '$0']);
+  const approved = new Set([
+    ...Object.entries(expected).filter(([name]) => name !== 'upgrade').map(([, value]) => value),
+    '$79',
+    '$0',
+  ]);
   // A comma only counts as a thousands separator. Matching [0-9,]* instead
   // swallows the comma in "instead of $89, and" and reports "$89," as an
   // unapproved amount.
@@ -104,7 +108,7 @@ if (section) {
   ];
   for (const [founding, regular] of savings) {
     const escaped = regular.replace('$', '\\$');
-    const marked = new RegExp(`<s>${escaped}</s>|normally\\s+${escaped}`).test(pricing);
+    const marked = new RegExp(`<s>${escaped}</s>|normally\\s+${escaped}`, 'i').test(pricing);
     check(marked, `${regular} is shown as the price ${founding} saves against`);
   }
 }
@@ -123,10 +127,12 @@ check(
   regular.complete.amountCents === founding.complete.regularAmountCents,
   'the regular Complete price matches what the founding offer compares against',
 );
-check(
-  regular.completeUpgrade.amountCents === founding.completeUpgrade.amountCents,
-  'the upgrade price does not move when the offer ends',
-);
+check(regular.complete.renewalAmountCents === 7_900,
+  'regular Complete renews for $79 per year');
+check(regular.completeUpgrade.renewalAmountCents === 7_900,
+  'a regular upgrade renews for $79 per year');
+check(regular.completeUpgrade.amountCents === 7_900,
+  'a regular upgrade starts at $79 with no separate first-year fee');
 check(
   regular.plus.regularAmountCents === undefined,
   'the regular offer has nothing to strike through',

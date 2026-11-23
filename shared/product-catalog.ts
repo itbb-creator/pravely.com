@@ -47,7 +47,7 @@ export const PRODUCT_CATALOG = {
   regularOffer: {
     plus: { amountCents: 8_900 },
     complete: { amountCents: 16_900, renewalAmountCents: 7_900 },
-    completeUpgrade: { amountCents: 9_000, renewalAmountCents: 7_900 },
+    completeUpgrade: { amountCents: 7_900, renewalAmountCents: 7_900 },
   },
 } as const;
 

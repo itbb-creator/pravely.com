@@ -17,7 +17,7 @@ for (const page of pages) {
   html = html
     .replace(/<footer\b[^>]*>[\s\S]*?<\/footer>/i, footer)
     .replace(/<a href="\.\/" class="flex items-center gap-3 font-extrabold tracking-tight"><img[^>]*pravely-app-icon\.png[^>]*>PRAVELY<\/a>/i, `<a href="./" aria-label="Pravely home">${horizontalBrand}</a>`)
-    .replace(/<a class="brand" href="\.\/"><img[^>]*pravely-app-icon\.png[^>]*>\s*PRAVELY<\/a>/i, `<a class="brand" href="./">${horizontalBrand}</a>`)
+    .replace(/<a class="brand" href="\.\/">\s*<img[^>]*pravely-app-icon\.png[^>]*>\s*PRAVELY\s*<\/a>/i, `<a class="brand" href="./">${horizontalBrand}</a>`)
     .replace(/<a href="\.\/" class="flex items-center gap-2 font-extrabold tracking-tight" aria-label="Pravely home">[\s\S]*?<\/a>/i, `<a href="./" aria-label="Pravely home">${horizontalBrand}</a>`)
     .replace(/<span style="display: block;margin: 0 auto 3\.125rem;[^"]*background: url\(data:image\/svg\+xml;base64,[\s\S]*?<\/span>/i, `<img src="./images/pravely-logo-horizontal.png" alt="Pravely" style="display:block;width:178px;height:auto;margin:0 auto 3.125rem">`)
     .replace(/<a href="\.\/" class="font-extrabold">← PRAVELY<\/a>/gi, `<a href="./" aria-label="Pravely home">${horizontalBrand}</a>`);
